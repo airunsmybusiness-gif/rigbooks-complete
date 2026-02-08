@@ -16,7 +16,7 @@ from helpers.transaction_classifier import TransactionClassifier
 from helpers.gst_calculator import GSTCalculator
 from helpers.shareholder_tracker import ShareholderTracker
 from helpers.report_generator import ReportGenerator
-from helpers.revenue_simple import calculate_revenue
+from style import get_modern_css, render_header
 
 st.set_page_config(
     page_title="CRA-Ready Books - Cape Bretoner's Oilfield",
@@ -38,6 +38,18 @@ if 'fiscal_year' not in st.session_state:
         fy_start = current_year - 1
         fy_end = current_year
     st.session_state.fiscal_year = f"{fy_start}-{fy_end}"
+
+# Inject modern CSS
+st.markdown(get_modern_css(), unsafe_allow_html=True)
+
+# Render professional header
+header_html = render_header(
+    "RigBooks",
+    "Cape Bretoner's Oilfield Services Ltd. - Professional Tax & Accounting System",
+    st.session_state.fiscal_year
+)
+st.markdown(header_html, unsafe_allow_html=True)
+
 
 def get_year_data_dir():
     year_dir = BASE_DATA_DIR / st.session_state.fiscal_year
@@ -178,29 +190,245 @@ if page == "📤 Upload & Process":
 
 
 elif page == "💰 Revenue":
-    st.title(f"💰 Revenue - FY {st.session_state.fiscal_year}")
+    st.title(f"💰 Revenue Tracking - FY {st.session_state.fiscal_year}")
+    st.caption(f"Period: Dec 1, {fy_start} to Nov 30, {fy_end}")
     
-    if st.session_state.classified_df is None:
-        st.warning("Upload and process bank statement first")
-        st.stop()
+    st.info("**CRA Requirement:** Track ALL business revenue sources. Only wire transfers from Long Run/PWC and mobile deposits count as revenue.")
     
-    rev = calculate_revenue(st.session_state.classified_df)
+    # Initialize revenue tracking
+    if 'manual_revenue' not in st.session_state:
+        st.session_state.manual_revenue = load_json('manual_revenue.json', [])
     
-    st.markdown("### Revenue Breakdown")
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("Wire Transfers", f"${rev['wire_total']:,.2f}")
-    with col2:
-        st.metric("Mobile Deposits", f"${rev['mobile_total']:,.2f}")
-    with col3:
-        st.metric("Branch Deposits", f"${rev['branch_total']:,.2f}")
+    # Auto-detect revenue from bank statement
+    if st.session_state.classified_df is not None:
+        df = st.session_state.classified_df
+        
+        st.markdown("### 📊 Auto-Detected Revenue from Bank Statement")
+        
+        # Revenue keywords - PWC and Long Run are SAME (PWC took over)
+        # Only count wire transfers from PWC/Long Run ONCE
+        longrun_pwc_mask = (df['credit'] > 0) & (
+            df['description'].str.contains('LONG RUN', case=False, na=False) | 
+            df['description'].str.contains('PRICEWATERHOUSECOOPERS', case=False, na=False) |
+            df['description'].str.contains('PWC', case=False, na=False)
+        ) & df['description'].str.contains('WIRE TSF', case=False, na=False)
+        
+        mobile_deposit_mask = (df['credit'] > 0) & df['description'].str.contains('MOBILE DEPOSIT', case=False, na=False)
+        branch_deposit_mask = (df['credit'] > 0) & df['description'].str.contains('DEPOSIT.*BANKING CENTRE', case=False, na=False, regex=True)
+        
+        revenue_mask = longrun_pwc_mask | mobile_deposit_mask | branch_deposit_mask
+        
+        auto_revenue = df[revenue_mask].copy()
+        
+        if len(auto_revenue) > 0:
+            # Display each revenue transaction
+            st.markdown("#### Revenue Transactions")
+        
+        # Revenue detection - FIXED to avoid double counting
+        # Wire transfers from Long Run/PWC are the SAME (PWC took over Long Run)
+        wire_transfers = df[
+            (df['credit'] > 0) & 
+            df['description'].str.contains('WIRE TSF', case=False, na=False)
+        ].copy()
+        
+        mobile_deposits = df[
+            (df['credit'] > 0) & 
+            df['description'].str.contains('MOBILE DEPOSIT', case=False, na=False)
+        ].copy()
+        
+        branch_deposits = df[
+            (df['credit'] > 0) & 
+            df['description'].str.contains('DEPOSIT.*BANKING CENTRE', case=False, na=False, regex=True)
+        ].copy()
+        
+        # Combine without duplicates
+        auto_revenue = pd.concat([wire_transfers, mobile_deposits, branch_deposits]).drop_duplicates()
+        
+        if len(auto_revenue) > 0:
+            for idx, row in auto_revenue.iterrows():
+                with st.expander(f"📅 {row['date']} - ${row['credit']:,.2f} - {row['description'][:60]}"):
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        st.metric("Date", row['date'])
+                    with col2:
+                        st.metric("Amount", f"${row['credit']:,.2f}")
+                    with col3:
+                        if 'WIRE TSF' in row['description']:
+                            revenue_type = "Long Run/PWC Wire Transfer"
+                        elif 'MOBILE DEPOSIT' in row['description']:
+                            revenue_type = "Mobile Deposit"
+                        else:
+                            revenue_type = "Branch Deposit"
+                        st.metric("Source", revenue_type)
+                    
+                    st.markdown(f"**Full Description:** {row['description']}")
+                    st.markdown(f"""
+                    **CRA Audit Trail:**
+                    - Transaction Date: {row['date']}
+                    - Revenue Type: Business Income
+                    - Source: {revenue_type}
+                    - Amount: ${row['credit']:,.2f}
+                    - Bank: CIBC Corporate Account
+                    - Status: Deposited and cleared
+                    """)
+            
+            st.markdown("---")
+            
+            # Summary by type
+            total_auto_revenue = auto_revenue['credit'].sum()
+            st.markdown("### 📈 Revenue Summary by Source")
+            
+            summary_data = []
+            
+            # Wire transfers (Long Run/PWC combined)
+            wire_total = wire_transfers['credit'].sum()
+            if wire_total > 0:
+                summary_data.append({
+                    'Source': 'Long Run/PWC Wire Transfers',
+                    'Transactions': len(wire_transfers),
+                    'Total Revenue': f'${wire_total:,.2f}'
+                })
+            
+            # Mobile deposits
+            mobile_total = mobile_deposits['credit'].sum()
+            if mobile_total > 0:
+                summary_data.append({
+                    'Source': 'Mobile Deposits',
+                    'Transactions': len(mobile_deposits),
+                    'Total Revenue': f'${mobile_total:,.2f}'
+                })
+            
+            # Branch deposits
+            branch_total = branch_deposits['credit'].sum()
+            if branch_total > 0:
+                summary_data.append({
+                    'Source': 'Branch Deposits',
+                    'Transactions': len(branch_deposits),
+                    'Total Revenue': f'${branch_total:,.2f}'
+                })
+            
+            st.table(pd.DataFrame(summary_data))
+            st.metric("**Total Revenue (No Double-Counting)**", f"${total_auto_revenue:,.2f}")
+            
+        st.markdown("---")
+            
+            # Summary
+            total_auto_revenue = auto_revenue['credit'].sum()
+            st.markdown("### 📈 Auto-Detected Revenue Summary")
+            
+            revenue_by_source = []
+            for keyword in ['LONG RUN', 'PRICEWATERHOUSECOOPERS', 'MOBILE DEPOSIT']:
+                mask = auto_revenue['description'].str.contains(keyword, case=False, na=False)
+                amount = auto_revenue[mask]['credit'].sum()
+                count = len(auto_revenue[mask])
+                if amount > 0:
+                    source_name = "Long Run Exploration" if keyword == 'LONG RUN' else \
+                                 "PWC (Long Run Contractor)" if keyword == 'PRICEWATERHOUSECOOPERS' else \
+                                 "Mobile Deposits"
+                    revenue_by_source.append({
+                        'Source': source_name,
+                        'Transactions': count,
+                        'Total Revenue': f'${amount:,.2f}'
+                    })
+            
+            st.table(pd.DataFrame(revenue_by_source))
+            st.metric("**Total Auto-Detected Revenue**", f"${total_auto_revenue:,.2f}")
+            
+        else:
+            st.warning("No revenue detected in bank statement. Upload statement first or add revenue manually below.")
+    else:
+        st.warning("Please upload and process a bank statement first.")
     
     st.markdown("---")
-    st.metric("**TOTAL REVENUE**", f"${rev['total']:,.2f}")
     
-    with st.expander("View Transactions"):
-        all_rev = pd.concat([rev['wire_transfers'], rev['mobile_deposits'], rev['branch_deposits']])
-        st.dataframe(all_rev[['date', 'description', 'credit']].sort_values('date'), use_container_width=True)
+    # Manual revenue entry
+    st.markdown("### ➕ Add Manual Revenue Entry")
+    st.caption("Use this if revenue was missed or received outside the bank statement")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        manual_date = st.date_input("Revenue Date", value=datetime.now(), key='manual_rev_date')
+        manual_source = st.selectbox("Revenue Source", [
+            "Long Run Exploration",
+            "PWC (Long Run Contractor)",
+            "Mobile Deposit - Client Payment",
+            "Cheque Deposit",
+            "Other Business Income"
+        ])
+        manual_amount = st.number_input("Amount ($)", min_value=0.0, step=0.01, key='manual_rev_amt')
+    
+    with col2:
+        manual_client = st.text_input("Client/Payer Name", placeholder="e.g., Long Run Exploration")
+        manual_invoice = st.text_input("Invoice/Reference Number", placeholder="Optional")
+        manual_notes = st.text_area("Notes/Description", placeholder="e.g., Pipeline maintenance services")
+    
+    if st.button("➕ Add Revenue Entry"):
+        if manual_amount > 0:
+            entry = {
+                'date': manual_date.strftime('%Y-%m-%d'),
+                'source': manual_source,
+                'client': manual_client,
+                'amount': manual_amount,
+                'invoice': manual_invoice,
+                'notes': manual_notes,
+                'added_manually': True,
+                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            }
+            st.session_state.manual_revenue.append(entry)
+            save_json('manual_revenue.json', st.session_state.manual_revenue)
+            st.success(f"✅ Added manual revenue: ${manual_amount:,.2f} from {manual_source}")
+            st.success(f"💾 Saved to: data/{st.session_state.fiscal_year}/manual_revenue.json")
+            st.rerun()
+        else:
+            st.error("Amount must be greater than $0")
+    
+    # Show manual entries
+    if st.session_state.manual_revenue:
+        st.markdown("---")
+        st.markdown("### 📝 Manual Revenue Entries")
+        
+        manual_df = pd.DataFrame(st.session_state.manual_revenue)
+        st.dataframe(manual_df[['date', 'source', 'client', 'amount', 'invoice', 'notes']], use_container_width=True)
+        
+        manual_total = manual_df['amount'].sum()
+        st.metric("Total Manual Revenue", f"${manual_total:,.2f}")
+        
+        if st.button("🗑️ Clear All Manual Entries"):
+            st.session_state.manual_revenue = []
+            save_json('manual_revenue.json', [])
+            st.rerun()
+    
+    # Grand total
+    st.markdown("---")
+    st.markdown("### 🎯 TOTAL REVENUE SUMMARY")
+    
+    auto_total = auto_revenue['credit'].sum() if st.session_state.classified_df is not None and len(auto_revenue) > 0 else 0
+    manual_total = sum(e['amount'] for e in st.session_state.manual_revenue)
+    grand_total = auto_total + manual_total
+    
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Auto-Detected", f"${auto_total:,.2f}")
+    with col2:
+        st.metric("Manual Entries", f"${manual_total:,.2f}")
+    with col3:
+        st.metric("**GRAND TOTAL**", f"${grand_total:,.2f}")
+    
+    st.success(f"✅ Total Business Revenue for FY {st.session_state.fiscal_year}: ${grand_total:,.2f}")
+    
+    # Download
+    st.markdown("---")
+    if st.session_state.classified_df is not None and len(auto_revenue) > 0:
+        revenue_csv = pd.concat([
+            auto_revenue[['date', 'description', 'credit']].rename(columns={'credit': 'amount', 'description': 'source'}),
+            manual_df[['date', 'source', 'amount']] if len(st.session_state.manual_revenue) > 0 else pd.DataFrame()
+        ])
+        st.download_button(
+            "📥 Download Complete Revenue Report",
+            revenue_csv.to_csv(index=False),
+            f"Revenue_Report_FY{st.session_state.fiscal_year}.csv",
+            "text/csv"
+        )
 
 elif page == "💵 Cash Expenses":
     st.title(f"💵 Cash Paid Expenses - FY {st.session_state.fiscal_year}")
@@ -259,63 +487,76 @@ elif page == "💵 Cash Expenses":
 elif page == "📱 Phone & Utilities":
     st.title(f"📱 Phone & Utilities - FY {st.session_state.fiscal_year}")
     st.caption(f"Period: Dec 1, {fy_start} to Nov 30, {fy_end}")
-    st.markdown("**CRA allows business-use percentage of phone bills. Enter actual monthly amounts.**")
-    
-    months = ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov']
-    
-    def get_person_data(person):
-        data = st.session_state.phone_bill.get(person, {})
-        if 'months' not in data:
-            data = {'months': {m: 0.0 for m in months}, 'business_pct': 100}
-        return data
+    st.markdown("**CRA allows business-use percentage of phone bills. Oilfield contractors typically claim 80-100%.**")
     
     st.markdown("### 👨 Greg's Phone (51% owner)")
-    greg_data = get_person_data('greg')
-    greg_pct = st.slider("Greg's Business Use %", 0, 100, greg_data.get('business_pct', 100), key='greg_pct')
-    cols = st.columns(6)
-    greg_months = {}
-    for i, m in enumerate(months):
-        with cols[i % 6]:
-            greg_months[m] = st.number_input(m, value=float(greg_data.get('months', {}).get(m, 0.0)), min_value=0.0, key=f'greg_{m}', format="%.2f")
-    greg_annual = sum(greg_months.values())
+    col1, col2 = st.columns(2)
+    with col1:
+        greg_monthly = st.number_input("Greg's Monthly Phone Bill ($)", 
+            value=float(st.session_state.phone_bill.get('greg', {}).get('monthly', 0.0)), 
+            min_value=0.0, key='greg_monthly')
+    with col2:
+        greg_pct = st.slider("Greg's Business Use %", 0, 100, 
+            st.session_state.phone_bill.get('greg', {}).get('business_pct', 100), key='greg_pct')
+    
+    greg_annual = greg_monthly * 12
     greg_deductible = greg_annual * (greg_pct / 100)
     greg_itc = greg_deductible * 0.05 / 1.05
     col1, col2, col3 = st.columns(3)
-    with col1: st.metric("Annual Total", f"${greg_annual:,.2f}")
+    with col1: st.metric("Annual Cost", f"${greg_annual:,.2f}")
     with col2: st.metric("Deductible", f"${greg_deductible:,.2f}")
     with col3: st.metric("ITC", f"${greg_itc:,.2f}")
     
     st.markdown("---")
     st.markdown("### 👩 Lilibeth's Phone (49% owner)")
-    lili_data = get_person_data('lilibeth')
-    lili_pct = st.slider("Lilibeth's Business Use %", 0, 100, lili_data.get('business_pct', 100), key='lili_pct')
-    cols = st.columns(6)
-    lili_months = {}
-    for i, m in enumerate(months):
-        with cols[i % 6]:
-            lili_months[m] = st.number_input(m, value=float(lili_data.get('months', {}).get(m, 0.0)), min_value=0.0, key=f'lili_{m}', format="%.2f")
-    lili_annual = sum(lili_months.values())
+    col1, col2 = st.columns(2)
+    with col1:
+        lili_monthly = st.number_input("Lilibeth's Monthly Phone Bill ($)", 
+            value=float(st.session_state.phone_bill.get('lilibeth', {}).get('monthly', 0.0)), 
+            min_value=0.0, key='lili_monthly')
+    with col2:
+        lili_pct = st.slider("Lilibeth's Business Use %", 0, 100, 
+            st.session_state.phone_bill.get('lilibeth', {}).get('business_pct', 100), key='lili_pct')
+    
+    lili_annual = lili_monthly * 12
     lili_deductible = lili_annual * (lili_pct / 100)
     lili_itc = lili_deductible * 0.05 / 1.05
     col1, col2, col3 = st.columns(3)
-    with col1: st.metric("Annual Total", f"${lili_annual:,.2f}")
+    with col1: st.metric("Annual Cost", f"${lili_annual:,.2f}")
     with col2: st.metric("Deductible", f"${lili_deductible:,.2f}")
     with col3: st.metric("ITC", f"${lili_itc:,.2f}")
     
     st.markdown("---")
+    st.markdown("### 📊 Combined Phone Bill Totals")
     total_phone_itc = greg_itc + lili_itc
     col1, col2, col3 = st.columns(3)
-    with col1: st.metric("Combined Annual", f"${greg_annual + lili_annual:,.2f}")
-    with col2: st.metric("Combined Deductible", f"${greg_deductible + lili_deductible:,.2f}")
-    with col3: st.metric("Combined ITC", f"${total_phone_itc:,.2f}")
+    with col1: st.metric("Total Annual", f"${greg_annual + lili_annual:,.2f}")
+    with col2: st.metric("Total Deductible", f"${greg_deductible + lili_deductible:,.2f}")
+    with col3: st.metric("Total ITC", f"${total_phone_itc:,.2f}")
     
-    if st.button("💾 Save Phone Bills", type="primary"):
+    if st.button("💾 Save Phone Bills"):
         st.session_state.phone_bill = {
-            'greg': {'months': greg_months, 'business_pct': greg_pct},
-            'lilibeth': {'months': lili_months, 'business_pct': lili_pct}
+            'greg': {'monthly': float(greg_monthly), 'business_pct': greg_pct},
+            'lilibeth': {'monthly': float(lili_monthly), 'business_pct': lili_pct}
         }
         save_json('phone_bill.json', st.session_state.phone_bill)
         st.success(f"💾 Saved to: data/{st.session_state.fiscal_year}/phone_bill.json")
+    
+    st.markdown("---")
+    st.markdown("### 🧮 Calculation Breakdown")
+    st.info(f"""**Greg's Phone:**
+    1. Monthly: ${greg_monthly:.2f}
+    2. Annual: ${greg_monthly:.2f} × 12 = ${greg_annual:.2f}
+    3. Business ({greg_pct}%): ${greg_annual:.2f} × {greg_pct}% = ${greg_deductible:.2f}
+    4. ITC: ${greg_deductible:.2f} × 0.05 / 1.05 = ${greg_itc:.2f}
+    
+    **Lilibeth's Phone:**
+    1. Monthly: ${lili_monthly:.2f}
+    2. Annual: ${lili_monthly:.2f} × 12 = ${lili_annual:.2f}
+    3. Business ({lili_pct}%): ${lili_annual:.2f} × {lili_pct}% = ${lili_deductible:.2f}
+    4. ITC: ${lili_deductible:.2f} × 0.05 / 1.05 = ${lili_itc:.2f}
+    
+    **Combined Total:** ITC = ${greg_itc:.2f} + ${lili_itc:.2f} = ${total_phone_itc:.2f}""")
 
 elif page == "📊 Transaction Review":
     st.title(f"📊 Transaction Review - FY {st.session_state.fiscal_year}")

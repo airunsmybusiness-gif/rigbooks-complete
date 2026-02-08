@@ -259,63 +259,76 @@ elif page == "💵 Cash Expenses":
 elif page == "📱 Phone & Utilities":
     st.title(f"📱 Phone & Utilities - FY {st.session_state.fiscal_year}")
     st.caption(f"Period: Dec 1, {fy_start} to Nov 30, {fy_end}")
-    st.markdown("**CRA allows business-use percentage of phone bills. Enter actual monthly amounts.**")
-    
-    months = ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov']
-    
-    def get_person_data(person):
-        data = st.session_state.phone_bill.get(person, {})
-        if 'months' not in data:
-            data = {'months': {m: 0.0 for m in months}, 'business_pct': 100}
-        return data
+    st.markdown("**CRA allows business-use percentage of phone bills. Oilfield contractors typically claim 80-100%.**")
     
     st.markdown("### 👨 Greg's Phone (51% owner)")
-    greg_data = get_person_data('greg')
-    greg_pct = st.slider("Greg's Business Use %", 0, 100, greg_data.get('business_pct', 100), key='greg_pct')
-    cols = st.columns(6)
-    greg_months = {}
-    for i, m in enumerate(months):
-        with cols[i % 6]:
-            greg_months[m] = st.number_input(m, value=float(greg_data.get('months', {}).get(m, 0.0)), min_value=0.0, key=f'greg_{m}', format="%.2f")
-    greg_annual = sum(greg_months.values())
+    col1, col2 = st.columns(2)
+    with col1:
+        greg_monthly = st.number_input("Greg's Monthly Phone Bill ($)", 
+            value=float(st.session_state.phone_bill.get('greg', {}).get('monthly', 0.0)), 
+            min_value=0.0, key='greg_monthly')
+    with col2:
+        greg_pct = st.slider("Greg's Business Use %", 0, 100, 
+            st.session_state.phone_bill.get('greg', {}).get('business_pct', 100), key='greg_pct')
+    
+    greg_annual = greg_monthly * 12
     greg_deductible = greg_annual * (greg_pct / 100)
     greg_itc = greg_deductible * 0.05 / 1.05
     col1, col2, col3 = st.columns(3)
-    with col1: st.metric("Annual Total", f"${greg_annual:,.2f}")
+    with col1: st.metric("Annual Cost", f"${greg_annual:,.2f}")
     with col2: st.metric("Deductible", f"${greg_deductible:,.2f}")
     with col3: st.metric("ITC", f"${greg_itc:,.2f}")
     
     st.markdown("---")
     st.markdown("### 👩 Lilibeth's Phone (49% owner)")
-    lili_data = get_person_data('lilibeth')
-    lili_pct = st.slider("Lilibeth's Business Use %", 0, 100, lili_data.get('business_pct', 100), key='lili_pct')
-    cols = st.columns(6)
-    lili_months = {}
-    for i, m in enumerate(months):
-        with cols[i % 6]:
-            lili_months[m] = st.number_input(m, value=float(lili_data.get('months', {}).get(m, 0.0)), min_value=0.0, key=f'lili_{m}', format="%.2f")
-    lili_annual = sum(lili_months.values())
+    col1, col2 = st.columns(2)
+    with col1:
+        lili_monthly = st.number_input("Lilibeth's Monthly Phone Bill ($)", 
+            value=float(st.session_state.phone_bill.get('lilibeth', {}).get('monthly', 0.0)), 
+            min_value=0.0, key='lili_monthly')
+    with col2:
+        lili_pct = st.slider("Lilibeth's Business Use %", 0, 100, 
+            st.session_state.phone_bill.get('lilibeth', {}).get('business_pct', 100), key='lili_pct')
+    
+    lili_annual = lili_monthly * 12
     lili_deductible = lili_annual * (lili_pct / 100)
     lili_itc = lili_deductible * 0.05 / 1.05
     col1, col2, col3 = st.columns(3)
-    with col1: st.metric("Annual Total", f"${lili_annual:,.2f}")
+    with col1: st.metric("Annual Cost", f"${lili_annual:,.2f}")
     with col2: st.metric("Deductible", f"${lili_deductible:,.2f}")
     with col3: st.metric("ITC", f"${lili_itc:,.2f}")
     
     st.markdown("---")
+    st.markdown("### 📊 Combined Phone Bill Totals")
     total_phone_itc = greg_itc + lili_itc
     col1, col2, col3 = st.columns(3)
-    with col1: st.metric("Combined Annual", f"${greg_annual + lili_annual:,.2f}")
-    with col2: st.metric("Combined Deductible", f"${greg_deductible + lili_deductible:,.2f}")
-    with col3: st.metric("Combined ITC", f"${total_phone_itc:,.2f}")
+    with col1: st.metric("Total Annual", f"${greg_annual + lili_annual:,.2f}")
+    with col2: st.metric("Total Deductible", f"${greg_deductible + lili_deductible:,.2f}")
+    with col3: st.metric("Total ITC", f"${total_phone_itc:,.2f}")
     
-    if st.button("💾 Save Phone Bills", type="primary"):
+    if st.button("💾 Save Phone Bills"):
         st.session_state.phone_bill = {
-            'greg': {'months': greg_months, 'business_pct': greg_pct},
-            'lilibeth': {'months': lili_months, 'business_pct': lili_pct}
+            'greg': {'monthly': float(greg_monthly), 'business_pct': greg_pct},
+            'lilibeth': {'monthly': float(lili_monthly), 'business_pct': lili_pct}
         }
         save_json('phone_bill.json', st.session_state.phone_bill)
         st.success(f"💾 Saved to: data/{st.session_state.fiscal_year}/phone_bill.json")
+    
+    st.markdown("---")
+    st.markdown("### 🧮 Calculation Breakdown")
+    st.info(f"""**Greg's Phone:**
+    1. Monthly: ${greg_monthly:.2f}
+    2. Annual: ${greg_monthly:.2f} × 12 = ${greg_annual:.2f}
+    3. Business ({greg_pct}%): ${greg_annual:.2f} × {greg_pct}% = ${greg_deductible:.2f}
+    4. ITC: ${greg_deductible:.2f} × 0.05 / 1.05 = ${greg_itc:.2f}
+    
+    **Lilibeth's Phone:**
+    1. Monthly: ${lili_monthly:.2f}
+    2. Annual: ${lili_monthly:.2f} × 12 = ${lili_annual:.2f}
+    3. Business ({lili_pct}%): ${lili_annual:.2f} × {lili_pct}% = ${lili_deductible:.2f}
+    4. ITC: ${lili_deductible:.2f} × 0.05 / 1.05 = ${lili_itc:.2f}
+    
+    **Combined Total:** ITC = ${greg_itc:.2f} + ${lili_itc:.2f} = ${total_phone_itc:.2f}""")
 
 elif page == "📊 Transaction Review":
     st.title(f"📊 Transaction Review - FY {st.session_state.fiscal_year}")
