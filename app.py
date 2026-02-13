@@ -1,11 +1,12 @@
 """
 RigBooks v4 - Smart Bookkeeping for Oilfield Contractors
-PERSISTENT DATA: Uses @st.cache_resource - survives page refresh
+FINAL VERSION: JSON file persistence + backup/restore
 """
 import streamlit as st
 import pandas as pd
 import re
 import json, os
+import calendar
 from datetime import datetime, date
 
 st.set_page_config(page_title="RigBooks", page_icon="⛽", layout="wide")
@@ -13,13 +14,18 @@ st.set_page_config(page_title="RigBooks", page_icon="⛽", layout="wide")
 CATEGORIES = ['Revenue - Oilfield Services','Fuel & Petroleum','Rent - Work Accommodation','Utilities','Vehicle Repairs','Equipment & Tools','Safety Gear & PPE','Meals (50%)','Entertainment (50%)','Professional Fees','Office Supplies','Phone & Communications','Internet','Bank Fees','Loan - Business Vehicle','Training & Certifications','Software & Subscriptions','Travel & Accommodations','Insurance','Donations','Other Business','Shareholder Distribution','Personal Expense','Tax Payment','Exclude']
 ITC_RATES = {'Fuel & Petroleum':1,'Rent - Work Accommodation':1,'Utilities':1,'Vehicle Repairs':1,'Equipment & Tools':1,'Safety Gear & PPE':1,'Professional Fees':1,'Office Supplies':1,'Phone & Communications':1,'Internet':1,'Training & Certifications':1,'Software & Subscriptions':1,'Travel & Accommodations':1,'Other Business':1,'Loan - Business Vehicle':1,'Meals (50%)':0.5,'Entertainment (50%)':0.5}
 STATUSES = ['business','personal','exclude']
+THIS_YEAR = date.today().year
 
 # ============================================================
-# PERMANENT DATA STORE - JSON file on disk
-# Local: persists forever. Cloud: persists within deployment.
-# Use Download/Restore Backup for full safety.
+# PERSISTENT DATA STORE - JSON file on disk
 # ============================================================
-DATA_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'rigbooks_data.json')
+_app_dir = os.path.dirname(os.path.abspath(__file__))
+DATA_FILE = os.path.join(_app_dir, 'rigbooks_data.json')
+# Test if writable, fall back to /tmp
+try:
+    with open(DATA_FILE, 'a'): pass
+except:
+    DATA_FILE = '/tmp/rigbooks_data.json'
 
 def _defaults():
     return {
@@ -43,8 +49,8 @@ def get_store():
         try:
             with open(DATA_FILE) as f:
                 data = json.load(f)
-            if 'transactions' in data:
-                data['transactions'] = pd.DataFrame(data['transactions']) if data['transactions'] else pd.DataFrame()
+            if 'transactions' in data and data['transactions']:
+                data['transactions'] = pd.DataFrame(data['transactions'])
             else:
                 data['transactions'] = pd.DataFrame()
             defaults = _defaults()
@@ -68,8 +74,12 @@ def persist():
                 save[k] = v
         with open(DATA_FILE, 'w') as f:
             json.dump(save, f, indent=2, default=str)
-    except:
-        pass
+    except Exception as e:
+        st.toast(f"Save warning: {e}")
+
+def save_and_rerun():
+    persist()
+    st.rerun()
 
 # ============================================================
 # HELPERS
@@ -144,28 +154,32 @@ def parse_csv(file):
         return pd.DataFrame()
 
 # Session state for UI-only widgets
-if 'date_filter' not in st.session_state: st.session_state.date_filter = 'Tax Year (Jan-Dec)'
-if 'custom_start' not in st.session_state: st.session_state.custom_start = date(2025,1,1)
-if 'custom_end' not in st.session_state: st.session_state.custom_end = date(2025,12,31)
+if 'date_filter' not in st.session_state: st.session_state.date_filter = 'All Time'
+if 'custom_start' not in st.session_state: st.session_state.custom_start = date(THIS_YEAR,1,1)
+if 'custom_end' not in st.session_state: st.session_state.custom_end = date(THIS_YEAR,12,31)
 
 # Sidebar
 with st.sidebar:
     st.markdown("## ⛽ RigBooks v4")
     st.markdown("*Smart Contractor Bookkeeping*")
-    st.markdown("🟢 **Data saves to disk permanently**")
+    # Data counts
+    _n = len(DB['revenue']) + len(DB['cash_expenses']) + len(DB['personal_expenses']) + len(DB['phone_bills']) + len(DB['other_expenses']) + len(DB['vehicle_expenses']) + len(DB['mileage']) + (len(DB['transactions']) if not DB['transactions'].empty else 0)
+    st.success(f"**{_n} entries saved to disk**")
     st.markdown("---")
     st.markdown("##### 📅 Date Range")
-    st.session_state.date_filter = st.selectbox("Period",["Monthly","Tax Year (Jan-Dec)","Custom"],index=["Monthly","Tax Year (Jan-Dec)","Custom"].index(st.session_state.date_filter))
-    if st.session_state.date_filter == "Monthly":
+    st.session_state.date_filter = st.selectbox("Period",["All Time","Tax Year (Jan-Dec)","Monthly","Custom"],index=["All Time","Tax Year (Jan-Dec)","Monthly","Custom"].index(st.session_state.date_filter))
+    if st.session_state.date_filter == "All Time":
+        start_date = date(2020, 1, 1)
+        end_date = date(2030, 12, 31)
+    elif st.session_state.date_filter == "Monthly":
         month = st.selectbox("Month",["January","February","March","April","May","June","July","August","September","October","November","December"])
-        year = st.number_input("Year",value=2025,min_value=2020,max_value=2030)
+        year = st.number_input("Year",value=THIS_YEAR,min_value=2020,max_value=2030)
         month_num = ["January","February","March","April","May","June","July","August","September","October","November","December"].index(month) + 1
-        import calendar
         last_day = calendar.monthrange(year, month_num)[1]
         start_date = date(year, month_num, 1)
         end_date = date(year, month_num, last_day)
     elif st.session_state.date_filter == "Tax Year (Jan-Dec)":
-        year = st.number_input("Tax Year",value=2025,min_value=2020,max_value=2030)
+        year = st.number_input("Tax Year",value=THIS_YEAR,min_value=2020,max_value=2030)
         start_date = date(year, 1, 1)
         end_date = date(year, 12, 31)
     else:
@@ -173,7 +187,8 @@ with st.sidebar:
         end_date = st.date_input("To",value=st.session_state.custom_end)
         st.session_state.custom_start = start_date
         st.session_state.custom_end = end_date
-    st.caption(f"📆 {start_date} to {end_date}")
+    if st.session_state.date_filter != "All Time":
+        st.caption(f"📆 {start_date} to {end_date}")
     st.markdown("---")
     page = st.radio("Navigation",["📤 Upload CSV","💵 Revenue","📋 Transactions","📱 Phone Bills","💳 Cash Expenses","🏦 Personal Account","🏠 Home Office","🚗 Vehicle & Mileage","📚 Other Expenses","💰 GST Filing","👥 Shareholder","📊 Accountant Summary","🛡️ CRA Guide"],label_visibility="collapsed")
     st.markdown("---")
@@ -196,9 +211,7 @@ with st.sidebar:
                     DB[_k2] = pd.DataFrame(_v2) if _v2 else pd.DataFrame()
                 else:
                     DB[_k2] = _v2
-            persist()
-            st.success("✅ Data restored!")
-            st.rerun()
+            save_and_rerun()
         except Exception as _e:
             st.error(f"Restore error: {_e}")
 
@@ -207,17 +220,17 @@ with st.sidebar:
 if page == "📤 Upload CSV":
     st.header("📤 Upload Bank Statement")
     if not DB['transactions'].empty:
-        st.success(f"✅ {len(DB['transactions'])} transactions loaded (saved!)")
+        st.success(f"✅ {len(DB['transactions'])} transactions loaded and saved!")
         if st.button("🗑️ Clear & Re-upload"):
             DB['transactions'] = pd.DataFrame()
-            st.rerun()
+            save_and_rerun()
     file = st.file_uploader("Choose CSV",type=['csv'])
     if file:
         df = parse_csv(file)
         if not df.empty:
             DB['transactions'] = df
             st.success(f"✅ Loaded & SAVED {len(df)} transactions!")
-            st.rerun()
+            save_and_rerun()
     if not DB['transactions'].empty:
         df = DB['transactions']
         st.dataframe(df.head(10),use_container_width=True,hide_index=True)
@@ -243,17 +256,20 @@ elif page == "💵 Revenue":
             if st.form_submit_button("➕ Add Revenue",type="primary") and r_amount > 0:
                 gst_amt = r_amount * 0.05 / 1.05 if r_gst == "Yes" else 0
                 DB['revenue'].append({'date':str(r_date),'client':r_client,'job':r_job,'amount':r_amount,'gst_included':r_gst,'gst_amount':round(gst_amt,2),'notes':r_notes})
-                st.rerun()
+                save_and_rerun()
     with c2:
-        st.subheader("Revenue Entries (Saved)")
+        st.subheader(f"Revenue Entries ({len(DB['revenue'])} total saved)")
         filtered_rev = filter_by_date(DB['revenue'], 'date', start_date, end_date)
         if filtered_rev:
             st.dataframe(pd.DataFrame(filtered_rev)[['date','client','job','amount','gst_included']],use_container_width=True,hide_index=True)
             c1,c2 = st.columns(2)
             c1.metric("Total Revenue",f"${sum(r['amount'] for r in filtered_rev):,.2f}")
             c2.metric("GST Collected",f"${sum(r['gst_amount'] for r in filtered_rev):,.2f}")
-            if st.button("🗑️ Clear All Revenue"): DB['revenue'] = []; st.rerun()
-        else: st.caption("No revenue entries yet")
+            if st.button("🗑️ Clear All Revenue"): DB['revenue'] = []; save_and_rerun()
+        elif DB['revenue']:
+            st.warning(f"📅 {len(DB['revenue'])} entries saved but outside current date filter. Change filter to 'All Time' to see them.")
+        else:
+            st.caption("No revenue entries yet")
 
 elif page == "📋 Transactions":
     st.header("📋 Transactions - Edit Category, Status, ITC")
@@ -275,8 +291,7 @@ elif page == "📋 Transactions":
                     DB['transactions'].loc[mask,'Category'] = row['Category']
                     DB['transactions'].loc[mask,'Status'] = row['Status']
                     DB['transactions'].loc[mask,'ITC'] = calc_itc(row['Debit'],row['Credit'],row['Category'],row['Status'])
-            st.success("✅ Saved to persistent store!")
-            st.rerun()
+            save_and_rerun()
 
 elif page == "📱 Phone Bills":
     st.header("📱 Phone Bills - Track Each Person Separately")
@@ -285,10 +300,10 @@ elif page == "📱 Phone Bills":
     c1,c2 = st.columns(2)
     if c1.button(f"➕ {sh2}: $1,081.42 (12mo @ 60%)"):
         DB['phone_bills'].append({'owner':sh2,'period':'Dec 2024-Nov 2025','amount':1081.42,'biz_pct':60,'notes':'12mo, $90.12/mo avg'})
-        st.rerun()
+        save_and_rerun()
     if c2.button(f"➕ {sh1}: $944.85 (12mo @ 60%)"):
         DB['phone_bills'].append({'owner':sh1,'period':'Dec 2024-Nov 2025','amount':944.85,'biz_pct':60,'notes':'12mo, $78.88/mo avg'})
-        st.rerun()
+        save_and_rerun()
     st.markdown("---")
     c1,c2 = st.columns(2)
     with c1:
@@ -301,7 +316,7 @@ elif page == "📱 Phone Bills":
             notes = st.text_input("Notes",placeholder="e.g., monthly avg, carrier")
             if st.form_submit_button("➕ Add",type="primary") and amt > 0:
                 DB['phone_bills'].append({'owner':owner,'period':period,'amount':amt,'biz_pct':biz,'notes':notes})
-                st.rerun()
+                save_and_rerun()
     with c2:
         st.subheader(f"Phone Bills ({len(DB['phone_bills'])} saved)")
         if DB['phone_bills']:
@@ -316,7 +331,7 @@ elif page == "📱 Phone Bills":
                             col1,col2,col3 = st.columns([3,2,1])
                             col1.write(f"{b['period']}: ${b['amount']:.2f}")
                             col2.write(f"ITC: ${itc:.2f}")
-                            if col3.button("🗑️",key=f"dp{i}"): DB['phone_bills'].pop(i); st.rerun()
+                            if col3.button("🗑️",key=f"dp{i}"): DB['phone_bills'].pop(i); save_and_rerun()
                     tot = sum(x['amount'] for x in bills)
                     tot_itc = sum(x['amount']*x['biz_pct']/100*0.05/1.05 for x in bills)
                     st.caption(f"Subtotal: ${tot:.2f} | ITC: ${tot_itc:.2f}")
@@ -339,14 +354,16 @@ elif page == "💳 Cash Expenses":
             if st.form_submit_button("➕ Add",type="primary") and amt > 0:
                 rate = 0.5 if '50%' in cat else 1.0
                 DB['cash_expenses'].append({'date':str(dt),'desc':desc,'amount':amt,'category':cat,'paid_by':who,'receipt':receipt,'itc':amt*0.05/1.05*rate})
-                st.rerun()
+                save_and_rerun()
     with c2:
+        st.subheader(f"Cash Expenses ({len(DB['cash_expenses'])} total saved)")
         filtered_cash = filter_by_date(DB['cash_expenses'], 'date', start_date, end_date)
         if filtered_cash:
             st.dataframe(pd.DataFrame(filtered_cash)[['date','desc','amount','category','paid_by','receipt']],use_container_width=True,hide_index=True)
             st.metric("Cash ITC",f"${sum(e['itc'] for e in filtered_cash):.2f}")
-            if st.button("🗑️ Clear All"): DB['cash_expenses'] = []; st.rerun()
-        st.caption(f"Total saved: {len(DB['cash_expenses'])} expenses")
+            if st.button("🗑️ Clear All"): DB['cash_expenses'] = []; save_and_rerun()
+        elif DB['cash_expenses']:
+            st.warning(f"📅 {len(DB['cash_expenses'])} entries saved but outside current date filter.")
 
 elif page == "🏦 Personal Account":
     st.header("🏦 Personal Bank/CC Expenses")
@@ -363,18 +380,20 @@ elif page == "🏦 Personal Account":
             if st.form_submit_button("➕ Add",type="primary") and amt > 0:
                 rate = 0.5 if '50%' in cat else 1.0
                 DB['personal_expenses'].append({'date':str(dt),'desc':desc,'amount':amt,'category':cat,'paid_from':who,'receipt':receipt,'itc':amt*0.05/1.05*rate})
-                st.rerun()
+                save_and_rerun()
     with c2:
+        st.subheader(f"Personal Expenses ({len(DB['personal_expenses'])} total saved)")
         filtered_pers = filter_by_date(DB['personal_expenses'], 'date', start_date, end_date)
         if filtered_pers:
             st.dataframe(pd.DataFrame(filtered_pers)[['date','desc','amount','category','paid_from','receipt']],use_container_width=True,hide_index=True)
             st.metric("Personal Acct ITC",f"${sum(e['itc'] for e in filtered_pers):.2f}")
-            if st.button("🗑️ Clear"): DB['personal_expenses'] = []; st.rerun()
-        st.caption(f"Total saved: {len(DB['personal_expenses'])} expenses")
+            if st.button("🗑️ Clear"): DB['personal_expenses'] = []; save_and_rerun()
+        elif DB['personal_expenses']:
+            st.warning(f"📅 {len(DB['personal_expenses'])} entries saved but outside current date filter.")
 
 elif page == "🏠 Home Office":
     st.header("🏠 Home Office - Detailed Breakdown")
-    st.info("💡 CRA: Utilities ARE claimable! Calculate: Office sq ft ÷ Total sq ft × Expenses")
+    st.info("💡 CRA: Utilities ARE claimable! Calculate: Office sq ft ÷ Total sq ft x Expenses")
     ho = DB['home_office']
     c1,c2 = st.columns(2)
     with c1:
@@ -402,7 +421,10 @@ elif page == "🏠 Home Office":
     c1.metric("Total Home Costs",f"${total:,.2f}")
     c2.metric(f"Deductible ({ho['pct']}%)",f"${total_ded:,.2f}")
     c3.metric("Home Office ITC",f"${total_ded*0.05/1.05:.2f}")
-    if st.button("💾 Save",type="primary"): DB['home_office'] = ho; st.success("✅ Saved!")
+    if st.button("💾 Save Home Office",type="primary"):
+        DB['home_office'] = ho
+        persist()
+        st.success("✅ Saved!")
 
 elif page == "🚗 Vehicle & Mileage":
     st.header("🚗 Vehicle Expenses & Mileage Log")
@@ -420,14 +442,15 @@ elif page == "🚗 Vehicle & Mileage":
                 if st.form_submit_button("➕ Add",type="primary") and amt > 0:
                     ded = amt*biz/100
                     DB['vehicle_expenses'].append({'desc':desc,'type':vcat,'amount':amt,'period':period,'vehicle':vehicle,'biz_pct':biz,'deductible':ded,'itc':ded*0.05/1.05})
-                    st.rerun()
+                    save_and_rerun()
         with c2:
+            st.subheader(f"Vehicle Expenses ({len(DB['vehicle_expenses'])} saved)")
             if DB['vehicle_expenses']:
                 for i,v in enumerate(DB['vehicle_expenses']):
                     col1,col2,col3 = st.columns([3,2,1])
                     col1.write(f"{v['desc']}: ${v['amount']:.2f}")
                     col2.write(f"ITC: ${v['itc']:.2f}")
-                    if col3.button("🗑️",key=f"dv{i}"): DB['vehicle_expenses'].pop(i); st.rerun()
+                    if col3.button("🗑️",key=f"dv{i}"): DB['vehicle_expenses'].pop(i); save_and_rerun()
                 st.metric("Vehicle ITC",f"${sum(v['itc'] for v in DB['vehicle_expenses']):.2f}")
     with tab2:
         st.info("💡 CRA Rates 2025: $0.72/km first 5,000km, $0.66/km after")
@@ -440,8 +463,9 @@ elif page == "🚗 Vehicle & Mileage":
                 m_total_km = st.number_input("Total KM (odometer)",min_value=0,step=1)
                 if st.form_submit_button("➕ Add",type="primary") and m_total_km > 0:
                     DB['mileage'].append({'date':str(m_date),'business_km':m_biz_km,'total_km':m_total_km})
-                    st.rerun()
+                    save_and_rerun()
         with c2:
+            st.subheader(f"Mileage ({len(DB['mileage'])} entries saved)")
             filtered_mileage = filter_by_date(DB['mileage'], 'date', start_date, end_date)
             if filtered_mileage:
                 total_biz_km = sum(m['business_km'] for m in filtered_mileage)
@@ -454,7 +478,7 @@ elif page == "🚗 Vehicle & Mileage":
                 c3.metric("Business %",f"{biz_pct:.1f}%")
                 cra_ded = (5000*0.72)+((total_biz_km-5000)*0.66) if total_biz_km > 5000 else total_biz_km*0.72
                 st.metric("CRA Mileage Deduction",f"${cra_ded:,.2f}")
-                if st.button("🗑️ Clear Mileage"): DB['mileage'] = []; st.rerun()
+                if st.button("🗑️ Clear Mileage"): DB['mileage'] = []; save_and_rerun()
 
 elif page == "📚 Other Expenses":
     st.header("📚 Other Expenses - Training, PPE, Software")
@@ -467,14 +491,16 @@ elif page == "📚 Other Expenses":
             amt = st.number_input("Amount ($)",min_value=0.0,step=0.01,key="oamt")
             if st.form_submit_button("➕ Add",type="primary") and amt > 0:
                 DB['other_expenses'].append({'date':str(dt),'desc':desc,'category':cat,'amount':amt,'itc':amt*0.05/1.05})
-                st.rerun()
+                save_and_rerun()
     with c2:
+        st.subheader(f"Other Expenses ({len(DB['other_expenses'])} total saved)")
         filtered_other = filter_by_date(DB['other_expenses'], 'date', start_date, end_date)
         if filtered_other:
             st.dataframe(pd.DataFrame(filtered_other)[['date','desc','category','amount']],use_container_width=True,hide_index=True)
             st.metric("Other ITC",f"${sum(e['itc'] for e in filtered_other):.2f}")
-            if st.button("🗑️ Clear"): DB['other_expenses'] = []; st.rerun()
-        st.caption(f"Total saved: {len(DB['other_expenses'])} expenses")
+            if st.button("🗑️ Clear"): DB['other_expenses'] = []; save_and_rerun()
+        elif DB['other_expenses']:
+            st.warning(f"📅 {len(DB['other_expenses'])} entries saved but outside current date filter.")
 
 elif page == "💰 GST Filing":
     st.header("💰 GST/HST Return (Form GST34)")
@@ -653,7 +679,5 @@ elif page == "🛡️ CRA Guide":
     st.markdown("📏 **[Detailed Mileage Log 2025](https://www.dropbox.com/scl/fo/7gpryeh93mgky0ybwn66c/AFgO-qdS7aSDhqNlXqX6bks?rlkey=529qzmdiamtdoxhpacfcxsn4v&st=mzzlyssr&dl=0)**")
     st.success("✅ With detailed records, you're audit-ready!")
 
-# ============================================================
-# AUTO-SAVE: persists all data to JSON file on every interaction
-# ============================================================
+# Auto-save at end of every run as safety net
 persist()
