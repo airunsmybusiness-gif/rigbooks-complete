@@ -5,6 +5,7 @@ PERSISTENT DATA: Uses @st.cache_resource - survives page refresh
 import streamlit as st
 import pandas as pd
 import re
+import json, os
 from datetime import datetime, date
 
 st.set_page_config(page_title="RigBooks", page_icon="⛽", layout="wide")
@@ -14,11 +15,13 @@ ITC_RATES = {'Fuel & Petroleum':1,'Rent - Work Accommodation':1,'Utilities':1,'V
 STATUSES = ['business','personal','exclude']
 
 # ============================================================
-# PERSISTENT DATA STORE - survives refresh, shared across tabs
-# Only resets on app redeploy
+# PERMANENT DATA STORE - JSON file on disk
+# Local: persists forever. Cloud: persists within deployment.
+# Use Download/Restore Backup for full safety.
 # ============================================================
-@st.cache_resource
-def get_store():
+DATA_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'rigbooks_data.json')
+
+def _defaults():
     return {
         'transactions': pd.DataFrame(),
         'phone_bills': [
@@ -34,7 +37,39 @@ def get_store():
         'mileage': [],
     }
 
+@st.cache_resource
+def get_store():
+    if os.path.exists(DATA_FILE):
+        try:
+            with open(DATA_FILE) as f:
+                data = json.load(f)
+            if 'transactions' in data:
+                data['transactions'] = pd.DataFrame(data['transactions']) if data['transactions'] else pd.DataFrame()
+            else:
+                data['transactions'] = pd.DataFrame()
+            defaults = _defaults()
+            for k in defaults:
+                if k not in data:
+                    data[k] = defaults[k]
+            return data
+        except:
+            pass
+    return _defaults()
+
 DB = get_store()
+
+def persist():
+    try:
+        save = {}
+        for k, v in DB.items():
+            if isinstance(v, pd.DataFrame):
+                save[k] = v.to_dict('records') if not v.empty else []
+            else:
+                save[k] = v
+        with open(DATA_FILE, 'w') as f:
+            json.dump(save, f, indent=2, default=str)
+    except:
+        pass
 
 # ============================================================
 # HELPERS
@@ -117,7 +152,7 @@ if 'custom_end' not in st.session_state: st.session_state.custom_end = date(2025
 with st.sidebar:
     st.markdown("## ⛽ RigBooks v4")
     st.markdown("*Smart Contractor Bookkeeping*")
-    st.markdown("🟢 **Data saves automatically**")
+    st.markdown("🟢 **Data saves to disk permanently**")
     st.markdown("---")
     st.markdown("##### 📅 Date Range")
     st.session_state.date_filter = st.selectbox("Period",["Monthly","Tax Year (Jan-Dec)","Custom"],index=["Monthly","Tax Year (Jan-Dec)","Custom"].index(st.session_state.date_filter))
@@ -146,6 +181,26 @@ with st.sidebar:
     sh1_pct = st.number_input("Ownership %",value=49,min_value=0,max_value=100)
     sh2 = st.text_input("Shareholder 2",value="Lilibeth")
     st.caption(f"{sh2}: {100-sh1_pct}%")
+    st.markdown("---")
+    st.markdown("##### 💾 Data Backup")
+    _bak = {}
+    for _k, _v in DB.items():
+        _bak[_k] = _v.to_dict('records') if isinstance(_v, pd.DataFrame) and not _v.empty else ([] if isinstance(_v, pd.DataFrame) else _v)
+    st.download_button("📥 Download Backup", json.dumps(_bak, indent=2, default=str), "rigbooks_backup.json", "application/json", use_container_width=True)
+    _restore = st.file_uploader("📤 Restore from backup", type=['json'], key="_rb")
+    if _restore:
+        try:
+            _raw = json.loads(_restore.read().decode('utf-8'))
+            for _k2, _v2 in _raw.items():
+                if _k2 == 'transactions':
+                    DB[_k2] = pd.DataFrame(_v2) if _v2 else pd.DataFrame()
+                else:
+                    DB[_k2] = _v2
+            persist()
+            st.success("✅ Data restored!")
+            st.rerun()
+        except Exception as _e:
+            st.error(f"Restore error: {_e}")
 
 # ==================== PAGES ====================
 
@@ -597,3 +652,8 @@ elif page == "🛡️ CRA Guide":
     st.info("CRA Rates 2025: $0.72/km first 5,000km, $0.66/km after")
     st.markdown("📏 **[Detailed Mileage Log 2025](https://www.dropbox.com/scl/fo/7gpryeh93mgky0ybwn66c/AFgO-qdS7aSDhqNlXqX6bks?rlkey=529qzmdiamtdoxhpacfcxsn4v&st=mzzlyssr&dl=0)**")
     st.success("✅ With detailed records, you're audit-ready!")
+
+# ============================================================
+# AUTO-SAVE: persists all data to JSON file on every interaction
+# ============================================================
+persist()
