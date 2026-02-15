@@ -8,6 +8,7 @@ import re
 import json, os
 import calendar
 from datetime import datetime, date
+from helpers.export_accountant import generate_pdf, generate_excel
 
 st.set_page_config(page_title="RigBooks", page_icon="⛽", layout="wide")
 
@@ -681,3 +682,72 @@ elif page == "🛡️ CRA Guide":
 
 # Auto-save at end of every run as safety net
 persist()
+
+elif page == "📧 Export for Accountant":
+    st.title("📧 Export for Accountant")
+    st.markdown("Generate **PDF** and **Excel** files with all your data — ready to email to your accountant.")
+
+    if st.session_state.classified_df is None:
+        st.warning("⚠️ Upload and process bank statements first.")
+        st.stop()
+
+    st.markdown("### What's included:")
+    st.markdown("""
+    - Revenue breakdown (Wire Transfers, Mobile Deposits, Branch Deposits, E-Transfers)
+    - Business expenses by CRA category with ITC calculations
+    - Cash expenses with receipt tracking
+    - Phone bill deductions (Greg + Lilibeth)
+    - GST/HST filing summary (Lines 101, 105, 108, 109)
+    - Shareholder income split (51/49)
+    - Full transaction list
+    """)
+
+    st.markdown("---")
+    col1, col2 = st.columns(2)
+
+    with col1:
+        if st.button("📄 Generate PDF", type="primary", use_container_width=True):
+            with st.spinner("Building PDF..."):
+                pdf_bytes = generate_pdf(
+                    st.session_state.classified_df,
+                    st.session_state.get('cash_expenses', []),
+                    st.session_state.get('phone_bill', {}),
+                    st.session_state.fiscal_year
+                )
+                st.session_state['_pdf_bytes'] = pdf_bytes
+                st.success("PDF ready!")
+
+        if '_pdf_bytes' in st.session_state:
+            st.download_button(
+                "⬇️ Download PDF",
+                st.session_state['_pdf_bytes'],
+                f"CapeBretonerOilfield_FY{st.session_state.fiscal_year}.pdf",
+                "application/pdf",
+                use_container_width=True
+            )
+
+    with col2:
+        if st.button("📊 Generate Excel", type="primary", use_container_width=True):
+            with st.spinner("Building Excel..."):
+                xlsx_bytes = generate_excel(
+                    st.session_state.classified_df,
+                    st.session_state.get('cash_expenses', []),
+                    st.session_state.get('phone_bill', {}),
+                    st.session_state.fiscal_year
+                )
+                st.session_state['_xlsx_bytes'] = xlsx_bytes
+                st.success("Excel ready!")
+
+        if '_xlsx_bytes' in st.session_state:
+            st.download_button(
+                "⬇️ Download Excel",
+                st.session_state['_xlsx_bytes'],
+                f"CapeBretonerOilfield_FY{st.session_state.fiscal_year}.xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                use_container_width=True
+            )
+
+    st.markdown("---")
+    st.info("💡 **Tip:** Download both files and email them to your accountant. "
+            "The PDF is print-ready. The Excel has 6 tabs she can filter and sort.")
+
