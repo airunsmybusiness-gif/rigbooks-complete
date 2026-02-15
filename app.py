@@ -110,6 +110,15 @@ CRA_CATEGORIES = {
 
 REVENUE_KEYWORDS = ['WIRE TSF', 'MOBILE DEP', 'BRANCH DEP', 'DEPOSIT', 'E-TRANSFER', 'INTERAC']
 
+ALL_CATEGORIES = ['Revenue'] + sorted([
+    'Fuel & Petroleum', 'Vehicle Repairs', 'Meals (50% ITC)',
+    'Equipment & Supplies', 'Insurance', 'Professional Fees',
+    'Bank Charges', 'Telephone', 'Rent', 'Utilities',
+    'Subcontractor', 'Wages & Payroll', 'GST Remittance',
+    'Loan Payment', 'Shareholder Distribution', 'Other / Unclassified'
+])
+
+
 def classify_transaction(desc):
     """Classify a transaction description into a CRA category."""
     desc_upper = desc.upper()
@@ -267,12 +276,60 @@ if page == "📤 Upload & Process":
             st.success("✅ Re-classified and saved!")
             st.rerun()
 
-    # Show classified data
+    # Show classified data with EDITABLE categories
     if st.session_state.classified_df is not None:
         st.markdown("### All Transactions")
+        st.caption("Click any cell in the **Category** column to reclassify. Hit Save when done.")
+
         display_cols = ['date', 'description', 'debit', 'credit', 'cra_category', 'itc_amount']
         cols_available = [c for c in display_cols if c in st.session_state.classified_df.columns]
-        st.dataframe(st.session_state.classified_df[cols_available], use_container_width=True, height=400)
+        edit_df = st.session_state.classified_df[cols_available].copy().reset_index(drop=True)
+
+        column_config = {
+            "cra_category": st.column_config.SelectboxColumn(
+                "Category",
+                options=ALL_CATEGORIES,
+                required=True,
+                width="medium",
+            ),
+            "date": st.column_config.TextColumn("Date", disabled=True, width="small"),
+            "description": st.column_config.TextColumn("Description", disabled=True, width="large"),
+            "debit": st.column_config.NumberColumn("Debit", disabled=True, format="$%.2f", width="small"),
+            "credit": st.column_config.NumberColumn("Credit", disabled=True, format="$%.2f", width="small"),
+            "itc_amount": st.column_config.NumberColumn("ITC", disabled=True, format="$%.2f", width="small"),
+        }
+
+        edited = st.data_editor(
+            edit_df,
+            column_config=column_config,
+            use_container_width=True,
+            height=500,
+            num_rows="fixed",
+            key="upload_editor",
+        )
+
+        if st.button("💾 Save All Category Changes", type="primary", key="save_upload_cats"):
+            # Apply edits back to classified_df
+            for i, row in edited.iterrows():
+                new_cat = row['cra_category']
+                if i < len(st.session_state.classified_df):
+                    st.session_state.classified_df.loc[st.session_state.classified_df.index[i], 'cra_category'] = new_cat
+                    # Recalc ITC
+                    if new_cat in CRA_CATEGORIES:
+                        pct = CRA_CATEGORIES[new_cat]['itc_pct']
+                    elif new_cat == 'Revenue':
+                        pct = 0.0
+                    else:
+                        pct = 1.0
+                    idx = st.session_state.classified_df.index[i]
+                    st.session_state.classified_df.loc[idx, 'itc_pct'] = pct
+                    debit = st.session_state.classified_df.loc[idx, 'debit']
+                    st.session_state.classified_df.loc[idx, 'itc_amount'] = debit * pct * 0.05 / 1.05 if new_cat != 'Revenue' else 0.0
+
+            save_df('classified_df.pkl', st.session_state.classified_df)
+            save_csv_backup('classified_backup.csv', st.session_state.classified_df)
+            st.success(f"✅ Saved {len(edited)} transactions with updated categories!")
+            st.rerun()
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -324,37 +381,58 @@ elif page == "💰 Revenue":
             with st.expander(f"{label} ({len(subset)} transactions — ${subset['credit'].sum():,.2f})"):
                 st.dataframe(subset[['date','description','credit']].reset_index(drop=True), use_container_width=True)
 
-    # Re-classify individual transactions
+    # Reclassify transactions inline
     st.markdown("---")
-    st.markdown("### Reclassify a Transaction")
-    st.caption("Change a transaction's category and it auto-saves immediately.")
+    st.markdown("### Reclassify Transactions")
+    st.caption("Click any **Category** cell to change it. Hit Save when done.")
 
-    all_cats = ['Revenue'] + sorted(CRA_CATEGORIES.keys())
-    edit_df = df.copy().reset_index(drop=True)
+    rev_edit = df.copy().reset_index(drop=True)
+    rev_display = ['date', 'description', 'debit', 'credit', 'cra_category']
+    rev_cols = [c for c in rev_display if c in rev_edit.columns]
 
-    txn_options = [f"{r['date']} | {r['description'][:40]} | D:{r['debit']:.2f} C:{r['credit']:.2f}" for _, r in edit_df.iterrows()]
-    selected_txn = st.selectbox("Select transaction", txn_options, key="rev_reclass_select")
+    rev_column_config = {
+        "cra_category": st.column_config.SelectboxColumn(
+            "Category",
+            options=ALL_CATEGORIES,
+            required=True,
+            width="medium",
+        ),
+        "date": st.column_config.TextColumn("Date", disabled=True, width="small"),
+        "description": st.column_config.TextColumn("Description", disabled=True, width="large"),
+        "debit": st.column_config.NumberColumn("Debit", disabled=True, format="$%.2f", width="small"),
+        "credit": st.column_config.NumberColumn("Credit", disabled=True, format="$%.2f", width="small"),
+    }
 
-    if selected_txn:
-        idx = txn_options.index(selected_txn)
-        current_cat = edit_df.loc[idx, 'cra_category'] if 'cra_category' in edit_df.columns else 'Other / Unclassified'
-        new_cat = st.selectbox("New category", all_cats, index=all_cats.index(current_cat) if current_cat in all_cats else 0, key="rev_new_cat")
+    rev_edited = st.data_editor(
+        rev_edit[rev_cols],
+        column_config=rev_column_config,
+        use_container_width=True,
+        height=400,
+        num_rows="fixed",
+        key="revenue_editor",
+    )
 
-        if st.button("💾 Save Reclassification", type="primary", key="rev_save_btn"):
-            st.session_state.classified_df.loc[idx, 'cra_category'] = new_cat
-            if new_cat in CRA_CATEGORIES:
-                pct = CRA_CATEGORIES[new_cat]['itc_pct']
-            elif new_cat == 'Revenue':
-                pct = 0.0
-            else:
-                pct = 1.0
-            st.session_state.classified_df.loc[idx, 'itc_pct'] = pct
-            debit = st.session_state.classified_df.loc[idx, 'debit']
-            st.session_state.classified_df.loc[idx, 'itc_amount'] = debit * pct * 0.05 / 1.05
-            save_df('classified_df.pkl', st.session_state.classified_df)
-            save_csv_backup('classified_backup.csv', st.session_state.classified_df)
-            st.success(f"✅ Saved! Transaction reclassified to '{new_cat}'")
-            st.rerun()
+    if st.button("\U0001f4be Save All Changes", type="primary", key="rev_save_all"):
+        for i, row in rev_edited.iterrows():
+            new_cat = row['cra_category']
+            if i < len(st.session_state.classified_df):
+                idx = st.session_state.classified_df.index[i]
+                st.session_state.classified_df.loc[idx, 'cra_category'] = new_cat
+                if new_cat in CRA_CATEGORIES:
+                    pct = CRA_CATEGORIES[new_cat]['itc_pct']
+                elif new_cat == 'Revenue':
+                    pct = 0.0
+                else:
+                    pct = 1.0
+                st.session_state.classified_df.loc[idx, 'itc_pct'] = pct
+                debit = st.session_state.classified_df.loc[idx, 'debit']
+                st.session_state.classified_df.loc[idx, 'itc_amount'] = debit * pct * 0.05 / 1.05 if new_cat != 'Revenue' else 0.0
+
+        save_df('classified_df.pkl', st.session_state.classified_df)
+        save_csv_backup('classified_backup.csv', st.session_state.classified_df)
+        st.success("\u2705 All category changes saved!")
+        st.rerun()
+
 
 
 # ════════════════════════════════════════════════════════════════════════════
