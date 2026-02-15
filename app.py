@@ -4,6 +4,7 @@ Cape Bretoner's Oilfield Services Ltd.
 ROBUST AUTO-SAVE VERSION — Every entry persists to disk immediately.
 """
 import streamlit as st
+import streamlit.components.v1
 import pandas as pd
 from datetime import datetime
 from io import StringIO
@@ -569,6 +570,46 @@ elif page == "🚗 Vehicle & Mileage":
             save_json('vehicle_mileage.json', vm)
             st.success("Deleted and saved!")
             st.rerun()
+
+
+
+    # ── CRA Mileage Log Viewer ──────────────────────────────────────────
+    st.markdown("---")
+    st.markdown("### 📄 CRA-Compliant Mileage Log (FY 2024-2025)")
+    st.caption("Full mileage log with 297 trips, odometer readings, and monthly breakdown. CRA audit-ready.")
+
+    mileage_html_path = Path("mileage_log_FY2024-2025.html")
+    if mileage_html_path.exists():
+        with open(mileage_html_path, 'r') as mf:
+            mileage_html = mf.read()
+
+        # Render inline
+        with st.expander("🔍 View Full Mileage Log (click to expand)", expanded=False):
+            st.components.v1.html(mileage_html, height=800, scrolling=True)
+
+        # Download button
+        st.download_button(
+            "⬇️ Download CRA Mileage Log (HTML)",
+            mileage_html,
+            "RigBooks_CRA_Compliant_Mileage_Log_FY2024-2025.html",
+            "text/html",
+            use_container_width=True
+        )
+
+        # Key stats from the log
+        st.markdown("#### Key Stats from Mileage Log")
+        mc1, mc2, mc3, mc4 = st.columns(4)
+        mc1.metric("Total Trips", "297")
+        mc2.metric("Total Distance", "14,128 km")
+        mc3.metric("Fuel Charges", "$12,041.21")
+        mc4.metric("Cost/km", "$0.8523")
+
+        mc1, mc2, mc3 = st.columns(3)
+        mc1.metric("Start Odometer", "97,178 km")
+        mc2.metric("End Odometer", "111,306 km")
+        mc3.metric("Business Use", "100%")
+    else:
+        st.warning("⚠️ Mileage log HTML file not found. Place `mileage_log_FY2024-2025.html` in the project root.")
 
 
 # ════════════════════════════════════════════════════════════════════════════
