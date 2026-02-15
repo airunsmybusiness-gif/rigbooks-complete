@@ -141,6 +141,7 @@ ALL_CATEGORIES = ['Revenue'] + sorted([
     'Income Tax Installment',
     'Personal - Not Deductible',
     'Transfer - Non-Taxable',
+    'Utilities',
     'CCA - Capital Asset',
     'Other / Unclassified',
 ])
@@ -177,6 +178,7 @@ ITC_RATES = {
     'Income Tax Installment': 0.0,
     'Personal - Not Deductible': 0.0,
     'Transfer - Non-Taxable': 0.0,
+    'Utilities': 1.0,
     'CCA - Capital Asset': 0.0,
     'Other / Unclassified': 1.0,
 }
