@@ -1,753 +1,963 @@
 """
-RigBooks v4 - Smart Bookkeeping for Oilfield Contractors
-FINAL VERSION: JSON file persistence + backup/restore
+RigBooks - CRA-Compliant Corporate Bookkeeping
+Cape Bretoner's Oilfield Services Ltd.
+ROBUST AUTO-SAVE VERSION — Every entry persists to disk immediately.
 """
 import streamlit as st
 import pandas as pd
+from datetime import datetime
+from io import StringIO
+import json
+from pathlib import Path
+import pickle
 import re
-import json, os
-import calendar
-from datetime import datetime, date
-from helpers.export_accountant import generate_pdf, generate_excel
 
-st.set_page_config(page_title="RigBooks", page_icon="⛽", layout="wide")
+# ════════════════════════════════════════════════════════════════════════════
+#  PERSISTENCE LAYER — All data saved per fiscal year
+# ════════════════════════════════════════════════════════════════════════════
 
-CATEGORIES = ['Revenue - Oilfield Services','Fuel & Petroleum','Rent - Work Accommodation','Utilities','Vehicle Repairs','Equipment & Tools','Safety Gear & PPE','Meals (50%)','Entertainment (50%)','Professional Fees','Office Supplies','Phone & Communications','Internet','Bank Fees','Loan - Business Vehicle','Training & Certifications','Software & Subscriptions','Travel & Accommodations','Insurance','Donations','Other Business','Shareholder Distribution','Personal Expense','Tax Payment','Exclude']
-ITC_RATES = {'Fuel & Petroleum':1,'Rent - Work Accommodation':1,'Utilities':1,'Vehicle Repairs':1,'Equipment & Tools':1,'Safety Gear & PPE':1,'Professional Fees':1,'Office Supplies':1,'Phone & Communications':1,'Internet':1,'Training & Certifications':1,'Software & Subscriptions':1,'Travel & Accommodations':1,'Other Business':1,'Loan - Business Vehicle':1,'Meals (50%)':0.5,'Entertainment (50%)':0.5}
-STATUSES = ['business','personal','exclude']
-THIS_YEAR = date.today().year
+st.set_page_config(page_title="RigBooks - Cape Bretoner's", page_icon="🛢️", layout="wide")
 
-# ============================================================
-# PERSISTENT DATA STORE - JSON file on disk
-# ============================================================
-_app_dir = os.path.dirname(os.path.abspath(__file__))
-DATA_FILE = os.path.join(_app_dir, 'rigbooks_data.json')
-# Test if writable, fall back to /tmp
-try:
-    with open(DATA_FILE, 'a'): pass
-except:
-    DATA_FILE = '/tmp/rigbooks_data.json'
+BASE_DATA_DIR = Path("data")
+BASE_DATA_DIR.mkdir(exist_ok=True)
 
-def _defaults():
-    return {
-        'transactions': pd.DataFrame(),
-        'phone_bills': [
-            {'owner':'Lilibeth','period':'Dec 2024-Nov 2025','amount':1081.42,'biz_pct':60,'notes':'12mo, $90.12/mo avg'},
-            {'owner':'Greg','period':'Dec 2024-Nov 2025','amount':944.85,'biz_pct':60,'notes':'12mo, $78.88/mo avg'},
-        ],
-        'cash_expenses': [],
-        'personal_expenses': [],
-        'other_expenses': [],
-        'vehicle_expenses': [],
-        'home_office': {'rent':0,'property_tax':0,'insurance':0,'electricity':0,'gas':0,'water':0,'internet':0,'pct':10},
-        'revenue': [],
-        'mileage': [],
+if 'fiscal_year' not in st.session_state:
+    st.session_state.fiscal_year = "2024-2025"
+
+def data_dir():
+    d = BASE_DATA_DIR / st.session_state.fiscal_year
+    d.mkdir(exist_ok=True)
+    return d
+
+def load_json(name, default):
+    p = data_dir() / name
+    if p.exists():
+        with open(p) as f:
+            return json.load(f)
+    return default
+
+def save_json(name, obj):
+    with open(data_dir() / name, 'w') as f:
+        json.dump(obj, f, indent=2, default=str)
+
+def load_df(name):
+    p = data_dir() / name
+    if p.exists():
+        return pd.read_pickle(p)
+    return None
+
+def save_df(name, df):
+    if df is not None and not df.empty:
+        df.to_pickle(data_dir() / name)
+
+def save_csv_backup(name, df):
+    """Also save a CSV copy for safety"""
+    if df is not None and not df.empty:
+        df.to_csv(data_dir() / name, index=False)
+
+
+# ════════════════════════════════════════════════════════════════════════════
+#  SESSION STATE INIT — Load from disk on first run
+# ════════════════════════════════════════════════════════════════════════════
+
+def init_state():
+    defaults = {
+        'corporate_df': ('corporate_df.pkl', 'df'),
+        'classified_df': ('classified_df.pkl', 'df'),
     }
+    json_defaults = {
+        'cash_expenses': ('cash_expenses.json', []),
+        'personal_expenses': ('personal_expenses.json', []),
+        'vehicle_mileage': ('vehicle_mileage.json', {'trips': [], 'start_odo': 0, 'end_odo': 0, 'fuel_total': 0}),
+        'other_expenses': ('other_expenses.json', {'training': [], 'ppe': [], 'software': [], 'other': []}),
+        'phone_bill': ('phone_bill.json', {
+            'greg': {'months': {m: 0.0 for m in ['Dec','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov']}, 'business_pct': 100},
+            'lilibeth': {'months': {m: 0.0 for m in ['Dec','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov']}, 'business_pct': 100}
+        }),
+    }
+    for key, (fname, _) in defaults.items():
+        if key not in st.session_state:
+            st.session_state[key] = load_df(fname)
+    for key, (fname, default) in json_defaults.items():
+        if key not in st.session_state:
+            st.session_state[key] = load_json(fname, default)
 
-@st.cache_resource
-def get_store():
-    if os.path.exists(DATA_FILE):
-        try:
-            with open(DATA_FILE) as f:
-                data = json.load(f)
-            if 'transactions' in data and data['transactions']:
-                data['transactions'] = pd.DataFrame(data['transactions'])
-            else:
-                data['transactions'] = pd.DataFrame()
-            defaults = _defaults()
-            for k in defaults:
-                if k not in data:
-                    data[k] = defaults[k]
-            return data
-        except:
-            pass
-    return _defaults()
+init_state()
 
-DB = get_store()
 
-def persist():
-    try:
-        save = {}
-        for k, v in DB.items():
-            if isinstance(v, pd.DataFrame):
-                save[k] = v.to_dict('records') if not v.empty else []
-            else:
-                save[k] = v
-        with open(DATA_FILE, 'w') as f:
-            json.dump(save, f, indent=2, default=str)
-    except Exception as e:
-        st.toast(f"Save warning: {e}")
+# ════════════════════════════════════════════════════════════════════════════
+#  CRA CLASSIFICATION ENGINE
+# ════════════════════════════════════════════════════════════════════════════
 
-def save_and_rerun():
-    persist()
-    st.rerun()
+CRA_CATEGORIES = {
+    'Fuel & Petroleum':       {'keywords': ['SHELL','ESSO','PETRO','HUSKY','GAS','FUEL','PIONEER','MOBIL','CHEVRON','CO-OP','CENTEX','DOMO','FAS GA','FGP','CIRCLE K'], 'itc_pct': 1.0},
+    'Vehicle Repairs':        {'keywords': ['CANADIAN TIRE','NAPA','LORDCO','KAL TIRE','OK TIRE','JIFFY','PART SOURCE','CARWASH','REGISTR'], 'itc_pct': 1.0},
+    'Meals (50% ITC)':        {'keywords': ['TIM HORTON','SUBWAY','MCDON','A&W','WENDY','BOSTON PIZZA','DENNY','SMITTY','RESTAURANT','DAIRY QUEEN','ACHTI','PIZZA','CAFE','COFFEE','J&R DRIVE'], 'itc_pct': 0.5},
+    'Equipment & Supplies':   {'keywords': ['OFFICE','STAPLES','WALMART','COSTCO','HOME DEPOT','LOWES','MARKS WORK','PRINCESS AUTO','HOME HARDWARE'], 'itc_pct': 1.0},
+    'Insurance':              {'keywords': ['INSURANCE','INTACT','MANULIFE','WAWANESA'], 'itc_pct': 0.0},
+    'Professional Fees':      {'keywords': ['LAWYER','LEGAL','ACCOUNTANT','CPA','BOOKKEEP','NOTARY','WCB','WORKERS COMP'], 'itc_pct': 1.0},
+    'Bank Charges':           {'keywords': ['BANK FEE','SERVICE CHARGE','INTEREST','NSF','MONTHLY FEE','BANK CHARGE'], 'itc_pct': 0.0},
+    'Telephone':              {'keywords': ['KOODO','TELUS','BELL','ROGERS','FIDO'], 'itc_pct': 1.0},
+    'Rent':                   {'keywords': ['RENT','REALTYFOCUS','LANDLORD'], 'itc_pct': 0.0},
+    'Utilities':              {'keywords': ['ATCO','EPCOR','ENMAX','DIRECT ENERGY','FORTIS'], 'itc_pct': 1.0},
+    'Subcontractor':          {'keywords': ['SUBCONTRACT'], 'itc_pct': 1.0},
+    'Wages & Payroll':        {'keywords': ['PAYROLL','SALARY','WAGES'], 'itc_pct': 0.0},
+    'GST Remittance':         {'keywords': ['RECEIVER GENERAL','GST','CRA','GOVERNMENT'], 'itc_pct': 0.0},
+    'Loan Payment':           {'keywords': ['LOAN','FINANCING','LEASE PMT'], 'itc_pct': 0.0},
+    'Shareholder Distribution': {'keywords': ['LILIBETH','SEJERA','GREG','MACDONALD'], 'itc_pct': 0.0},
+}
 
-# ============================================================
-# HELPERS
-# ============================================================
-def filter_by_date(data_list, date_key, start_date, end_date):
-    if not data_list: return data_list
-    filtered = []
-    for item in data_list:
-        try:
-            item_date = pd.to_datetime(item.get(date_key, '2025-01-01')).date()
-            if start_date <= item_date <= end_date: filtered.append(item)
-        except: filtered.append(item)
-    return filtered
+REVENUE_KEYWORDS = ['WIRE TSF', 'MOBILE DEP', 'BRANCH DEP', 'DEPOSIT', 'E-TRANSFER', 'INTERAC']
 
-def get_status(cat):
-    if cat in ['Revenue - Oilfield Services','Shareholder Distribution','Tax Payment','Exclude']: return 'exclude'
-    if cat == 'Personal Expense': return 'personal'
-    return 'business'
+def classify_transaction(desc):
+    """Classify a transaction description into a CRA category."""
+    desc_upper = desc.upper()
+    # Check revenue first
+    for kw in REVENUE_KEYWORDS:
+        if kw in desc_upper:
+            return 'Revenue', 0.0
+    # Check expense categories
+    for cat, info in CRA_CATEGORIES.items():
+        for kw in info['keywords']:
+            if kw in desc_upper:
+                return cat, info['itc_pct']
+    return 'Other / Unclassified', 1.0
 
-def classify(desc):
-    d = desc.upper()
-    if re.search(r'WIRE TSF.*PRICE|LONG RUN|MOBILE DEPOSIT',d): return 'Revenue - Oilfield Services'
-    if re.search(r'PAULA GOUR|1695784 ALBERTA',d): return 'Exclude'
-    if re.search(r'GOVERNMENT CANADA',d): return 'Tax Payment'
-    if re.search(r'INTERNET TRANSFER.*TO:.*00099|E-TRANSFER.*LILIBETH|ATM WITHDR|ABM WITHDR|BANKING CENTRE|BRANCH.*WITHDR',d): return 'Shareholder Distribution'
-    if re.search(r'TD ON-LINE LOANS|LOAN PAYMENT.*TD|SCOTIA BANK.*LOAN|LOAN.*SCOTIA',d): return 'Loan - Business Vehicle'
-    if re.search(r'RENT@|REALTY|FOCUS@',d): return 'Rent - Work Accommodation'
-    if re.search(r'EPCOR|ATCO|DIRECT ENERGY|ENMAX',d): return 'Utilities'
-    if re.search(r'ACCOUNT FEE|SERVICE CHARGE|MONTHLY.*FEE',d): return 'Bank Fees'
-    if re.search(r'MANULIFE',d): return 'Insurance'
-    if re.search(r'KOODO|TELUS|BELL|ROGERS|FIDO',d): return 'Phone & Communications'
-    if re.search(r'SHAW',d): return 'Internet'
-    if re.search(r'PETRO|SHELL|ESSO|CHEVRON|CENTEX|MOBIL|FAS GA|FGP|CIRCLE K|CO-OP|BOYLE|DOMO|HUSKY',d): return 'Fuel & Petroleum'
-    if re.search(r'OK TIRE|NAPA|PART SOURCE|JIFFY|KEEPS MECH|GOODBRAND|SOUTH.?FORT|CANADIAN TIRE|VET',d): return 'Vehicle Repairs'
-    if re.search(r'PRINCESS AUTO|HOME HARDWARE',d): return 'Equipment & Tools'
-    if re.search(r'NOTARY|LAWYER|ACCOUNTANT|WORKERS COMP|COSTCO BUSINESS',d): return 'Professional Fees'
-    if re.search(r'DOLLARAMA|IKEA|STAPLES',d): return 'Office Supplies'
-    if re.search(r'COMMUNITY|DONATION',d): return 'Donations'
-    if re.search(r'TIM HORTON|A&W |MCDONALD|SUBWAY|ACHTI|RAINBOW|UPTOWN|KICKS|LILY|SNOW VALLEY|KIM|JOEY|IGA|WALMART|SUPERSTORE|SAFEWAY',d): return 'Meals (50%)'
-    if re.search(r'GOLF',d): return 'Entertainment (50%)'
-    if re.search(r'LIQUOR|CANNA|GREEN SOLUTION',d): return 'Personal Expense'
-    if re.search(r'LITTLE STEPS|DAYCARE|BARBER|UPMEN',d): return 'Personal Expense'
-    return 'Other Business'
+def classify_dataframe(df):
+    """Classify entire DataFrame and compute ITC amounts."""
+    df = df.copy()
+    cats = []
+    itc_pcts = []
+    for _, row in df.iterrows():
+        cat, pct = classify_transaction(row.get('description', ''))
+        cats.append(cat)
+        itc_pcts.append(pct)
+    df['cra_category'] = cats
+    df['itc_pct'] = itc_pcts
+    df['itc_amount'] = df['debit'] * df['itc_pct'] * 0.05 / 1.05
+    df.loc[df['cra_category'] == 'Revenue', 'itc_amount'] = 0.0
+    return df
 
-def calc_itc(debit,credit,cat,status):
-    if status != 'business' or credit > 0: return 0.0
-    return round((debit * 0.05 / 1.05) * ITC_RATES.get(cat,0), 2)
-
-def parse_csv(file):
-    try:
-        content = file.read().decode('utf-8')
-        data = []
-        for line in content.strip().split('\n'):
-            parts, cur, inq = [], '', False
-            for c in line:
-                if c == '"': inq = not inq
-                elif c == ',' and not inq: parts.append(cur.strip()); cur = ''
-                else: cur += c
-            parts.append(cur.strip())
-            if len(parts) >= 3:
-                dt, desc = parts[0], parts[1]
-                if 'date' in dt.lower(): continue
-                clean = lambda s: float((s or '').replace('$','').replace(',','').strip() or 0)
-                debit, credit = clean(parts[2]) if len(parts)>2 else 0, clean(parts[3]) if len(parts)>3 else 0
-                if debit == 0 and credit == 0: continue
-                cat = classify(desc)
-                status = get_status(cat)
-                data.append({'Date':dt,'Description':desc,'Debit':debit,'Credit':credit,'Category':cat,'Status':status,'ITC':calc_itc(debit,credit,cat,status)})
-        return pd.DataFrame(data)
-    except Exception as e:
-        st.error(f"Error: {e}")
-        return pd.DataFrame()
-
-# Session state for UI-only widgets
-if 'date_filter' not in st.session_state: st.session_state.date_filter = 'All Time'
-if 'custom_start' not in st.session_state: st.session_state.custom_start = date(THIS_YEAR,1,1)
-if 'custom_end' not in st.session_state: st.session_state.custom_end = date(THIS_YEAR,12,31)
-
-# Sidebar
-with st.sidebar:
-    st.markdown("## ⛽ RigBooks v4")
-    st.markdown("*Smart Contractor Bookkeeping*")
-    # Data counts
-    _n = len(DB['revenue']) + len(DB['cash_expenses']) + len(DB['personal_expenses']) + len(DB['phone_bills']) + len(DB['other_expenses']) + len(DB['vehicle_expenses']) + len(DB['mileage']) + (len(DB['transactions']) if not DB['transactions'].empty else 0)
-    st.success(f"**{_n} entries saved to disk**")
-    st.markdown("---")
-    st.markdown("##### 📅 Date Range")
-    st.session_state.date_filter = st.selectbox("Period",["All Time","Tax Year (Jan-Dec)","Monthly","Custom"],index=["All Time","Tax Year (Jan-Dec)","Monthly","Custom"].index(st.session_state.date_filter))
-    if st.session_state.date_filter == "All Time":
-        start_date = date(2020, 1, 1)
-        end_date = date(2030, 12, 31)
-    elif st.session_state.date_filter == "Monthly":
-        month = st.selectbox("Month",["January","February","March","April","May","June","July","August","September","October","November","December"])
-        year = st.number_input("Year",value=THIS_YEAR,min_value=2020,max_value=2030)
-        month_num = ["January","February","March","April","May","June","July","August","September","October","November","December"].index(month) + 1
-        last_day = calendar.monthrange(year, month_num)[1]
-        start_date = date(year, month_num, 1)
-        end_date = date(year, month_num, last_day)
-    elif st.session_state.date_filter == "Tax Year (Jan-Dec)":
-        year = st.number_input("Tax Year",value=THIS_YEAR,min_value=2020,max_value=2030)
-        start_date = date(year, 1, 1)
-        end_date = date(year, 12, 31)
-    else:
-        start_date = st.date_input("From",value=st.session_state.custom_start)
-        end_date = st.date_input("To",value=st.session_state.custom_end)
-        st.session_state.custom_start = start_date
-        st.session_state.custom_end = end_date
-    if st.session_state.date_filter != "All Time":
-        st.caption(f"📆 {start_date} to {end_date}")
-    st.markdown("---")
-    page = st.radio("Navigation",["📤 Upload CSV","💵 Revenue","📋 Transactions","📱 Phone Bills","💳 Cash Expenses","🏦 Personal Account","🏠 Home Office","🚗 Vehicle & Mileage","📚 Other Expenses","💰 GST Filing","👥 Shareholder","📊 Accountant Summary","🛡️ CRA Guide"],label_visibility="collapsed")
-    st.markdown("---")
-    sh1 = st.text_input("Shareholder 1",value="Greg")
-    sh1_pct = st.number_input("Ownership %",value=49,min_value=0,max_value=100)
-    sh2 = st.text_input("Shareholder 2",value="Lilibeth")
-    st.caption(f"{sh2}: {100-sh1_pct}%")
-    st.markdown("---")
-    st.markdown("##### 💾 Data Backup")
-    _bak = {}
-    for _k, _v in DB.items():
-        _bak[_k] = _v.to_dict('records') if isinstance(_v, pd.DataFrame) and not _v.empty else ([] if isinstance(_v, pd.DataFrame) else _v)
-    st.download_button("📥 Download Backup", json.dumps(_bak, indent=2, default=str), "rigbooks_backup.json", "application/json", use_container_width=True)
-    _restore = st.file_uploader("📤 Restore from backup", type=['json'], key="_rb")
-    if _restore:
-        try:
-            _raw = json.loads(_restore.read().decode('utf-8'))
-            for _k2, _v2 in _raw.items():
-                if _k2 == 'transactions':
-                    DB[_k2] = pd.DataFrame(_v2) if _v2 else pd.DataFrame()
-                else:
-                    DB[_k2] = _v2
-            save_and_rerun()
-        except Exception as _e:
-            st.error(f"Restore error: {_e}")
-
-# ==================== PAGES ====================
-
-if page == "📤 Upload CSV":
-    st.header("📤 Upload Bank Statement")
-    if not DB['transactions'].empty:
-        st.success(f"✅ {len(DB['transactions'])} transactions loaded and saved!")
-        if st.button("🗑️ Clear & Re-upload"):
-            DB['transactions'] = pd.DataFrame()
-            save_and_rerun()
-    file = st.file_uploader("Choose CSV",type=['csv'])
-    if file:
-        df = parse_csv(file)
-        if not df.empty:
-            DB['transactions'] = df
-            st.success(f"✅ Loaded & SAVED {len(df)} transactions!")
-            save_and_rerun()
-    if not DB['transactions'].empty:
-        df = DB['transactions']
-        st.dataframe(df.head(10),use_container_width=True,hide_index=True)
-        c1,c2,c3,c4 = st.columns(4)
-        c1.metric("Transactions",len(df))
-        c2.metric("Revenue",f"${df[df['Category']=='Revenue - Oilfield Services']['Credit'].sum():,.0f}")
-        c3.metric("Expenses",f"${df[df['Status']=='business']['Debit'].sum():,.0f}")
-        c4.metric("ITCs",f"${df['ITC'].sum():,.2f}")
-
-elif page == "💵 Revenue":
-    st.header("💵 Revenue - Hauling Tickets & Oilfield Jobs")
-    st.info("💡 Enter all income from oilfield services, hauling, consulting, etc.")
-    c1,c2 = st.columns(2)
-    with c1:
-        st.subheader("Add Revenue Entry")
-        with st.form("revenue_form",clear_on_submit=True):
-            r_date = st.date_input("Date",key="rev_date")
-            r_client = st.text_input("Client",placeholder="e.g., Long Run Exploration")
-            r_job = st.text_input("Job/Service",placeholder="e.g., Hotshot to Redwater")
-            r_amount = st.number_input("Amount ($)",min_value=0.0,step=0.01)
-            r_gst = st.selectbox("GST Included?",["Yes","No"])
-            r_notes = st.text_input("Notes",placeholder="e.g., Invoice #1234")
-            if st.form_submit_button("➕ Add Revenue",type="primary") and r_amount > 0:
-                gst_amt = r_amount * 0.05 / 1.05 if r_gst == "Yes" else 0
-                DB['revenue'].append({'date':str(r_date),'client':r_client,'job':r_job,'amount':r_amount,'gst_included':r_gst,'gst_amount':round(gst_amt,2),'notes':r_notes})
-                save_and_rerun()
-    with c2:
-        st.subheader(f"Revenue Entries ({len(DB['revenue'])} total saved)")
-        filtered_rev = filter_by_date(DB['revenue'], 'date', start_date, end_date)
-        if filtered_rev:
-            st.dataframe(pd.DataFrame(filtered_rev)[['date','client','job','amount','gst_included']],use_container_width=True,hide_index=True)
-            c1,c2 = st.columns(2)
-            c1.metric("Total Revenue",f"${sum(r['amount'] for r in filtered_rev):,.2f}")
-            c2.metric("GST Collected",f"${sum(r['gst_amount'] for r in filtered_rev):,.2f}")
-            if st.button("🗑️ Clear All Revenue"): DB['revenue'] = []; save_and_rerun()
-        elif DB['revenue']:
-            st.warning(f"📅 {len(DB['revenue'])} entries saved but outside current date filter. Change filter to 'All Time' to see them.")
-        else:
-            st.caption("No revenue entries yet")
-
-elif page == "📋 Transactions":
-    st.header("📋 Transactions - Edit Category, Status, ITC")
-    if DB['transactions'].empty:
-        st.warning("Upload CSV first")
-    else:
-        df = DB['transactions'].copy()
-        c1,c2 = st.columns(2)
-        cat_f = c1.selectbox("Filter Category",["All"]+sorted(df['Category'].unique().tolist()))
-        stat_f = c2.selectbox("Filter Status",["All"]+STATUSES)
-        fdf = df.copy()
-        if cat_f != "All": fdf = fdf[fdf['Category']==cat_f]
-        if stat_f != "All": fdf = fdf[fdf['Status']==stat_f]
-        edited = st.data_editor(fdf,column_config={"Category":st.column_config.SelectboxColumn("Category",options=CATEGORIES),"Status":st.column_config.SelectboxColumn("Status",options=STATUSES),"ITC":st.column_config.NumberColumn("ITC",format="$%.2f")},use_container_width=True,hide_index=True)
-        if st.button("💾 Save Changes",type="primary"):
-            for _,row in edited.iterrows():
-                mask = (DB['transactions']['Date']==row['Date'])&(DB['transactions']['Description']==row['Description'])&(DB['transactions']['Debit']==row['Debit'])
-                if mask.any():
-                    DB['transactions'].loc[mask,'Category'] = row['Category']
-                    DB['transactions'].loc[mask,'Status'] = row['Status']
-                    DB['transactions'].loc[mask,'ITC'] = calc_itc(row['Debit'],row['Credit'],row['Category'],row['Status'])
-            save_and_rerun()
-
-elif page == "📱 Phone Bills":
-    st.header("📱 Phone Bills - Track Each Person Separately")
-    st.info("💡 CRA: Claim only substantiated business-use portion (50-80% typical)")
-    st.subheader("⚡ Quick Add Your Data")
-    c1,c2 = st.columns(2)
-    if c1.button(f"➕ {sh2}: $1,081.42 (12mo @ 60%)"):
-        DB['phone_bills'].append({'owner':sh2,'period':'Dec 2024-Nov 2025','amount':1081.42,'biz_pct':60,'notes':'12mo, $90.12/mo avg'})
-        save_and_rerun()
-    if c2.button(f"➕ {sh1}: $944.85 (12mo @ 60%)"):
-        DB['phone_bills'].append({'owner':sh1,'period':'Dec 2024-Nov 2025','amount':944.85,'biz_pct':60,'notes':'12mo, $78.88/mo avg'})
-        save_and_rerun()
-    st.markdown("---")
-    c1,c2 = st.columns(2)
-    with c1:
-        st.subheader("Add Phone Bill")
-        with st.form("phone",clear_on_submit=True):
-            owner = st.selectbox("Whose Phone?",[sh1,sh2])
-            period = st.text_input("Period",placeholder="e.g., Jan 2025 or Dec'24-Nov'25")
-            amt = st.number_input("Amount ($)",min_value=0.0,step=0.01)
-            biz = st.slider("Business Use %",0,100,60)
-            notes = st.text_input("Notes",placeholder="e.g., monthly avg, carrier")
-            if st.form_submit_button("➕ Add",type="primary") and amt > 0:
-                DB['phone_bills'].append({'owner':owner,'period':period,'amount':amt,'biz_pct':biz,'notes':notes})
-                save_and_rerun()
-    with c2:
-        st.subheader(f"Phone Bills ({len(DB['phone_bills'])} saved)")
-        if DB['phone_bills']:
-            for person in [sh1,sh2]:
-                bills = [p for p in DB['phone_bills'] if p['owner']==person]
-                if bills:
-                    st.markdown(f"**{person}:**")
-                    for i,b in enumerate(DB['phone_bills']):
-                        if b['owner']==person:
-                            ded = b['amount']*b['biz_pct']/100
-                            itc = ded*0.05/1.05
-                            col1,col2,col3 = st.columns([3,2,1])
-                            col1.write(f"{b['period']}: ${b['amount']:.2f}")
-                            col2.write(f"ITC: ${itc:.2f}")
-                            if col3.button("🗑️",key=f"dp{i}"): DB['phone_bills'].pop(i); save_and_rerun()
-                    tot = sum(x['amount'] for x in bills)
-                    tot_itc = sum(x['amount']*x['biz_pct']/100*0.05/1.05 for x in bills)
-                    st.caption(f"Subtotal: ${tot:.2f} | ITC: ${tot_itc:.2f}")
-                    st.markdown("---")
-            grand_itc = sum(p['amount']*p['biz_pct']/100*0.05/1.05 for p in DB['phone_bills'])
-            st.metric("📱 Total Phone ITC",f"${grand_itc:.2f}")
-
-elif page == "💳 Cash Expenses":
-    st.header("💳 Cash Expenses")
-    st.info("Under $30=no receipt. $30-$150=keep receipt. Over $150=required")
-    c1,c2 = st.columns(2)
-    with c1:
-        with st.form("cash",clear_on_submit=True):
-            dt = st.date_input("Date")
-            desc = st.text_input("Description")
-            amt = st.number_input("Amount ($)",min_value=0.0,step=0.01)
-            cat = st.selectbox("Category",["Fuel & Petroleum","Vehicle Repairs","Equipment & Tools","Safety Gear & PPE","Meals (50%)","Office Supplies","Other Business"])
-            who = st.selectbox("Paid By",[sh1,sh2])
-            receipt = st.text_input("Receipt # or Link",placeholder="e.g., R-001")
-            if st.form_submit_button("➕ Add",type="primary") and amt > 0:
-                rate = 0.5 if '50%' in cat else 1.0
-                DB['cash_expenses'].append({'date':str(dt),'desc':desc,'amount':amt,'category':cat,'paid_by':who,'receipt':receipt,'itc':amt*0.05/1.05*rate})
-                save_and_rerun()
-    with c2:
-        st.subheader(f"Cash Expenses ({len(DB['cash_expenses'])} total saved)")
-        filtered_cash = filter_by_date(DB['cash_expenses'], 'date', start_date, end_date)
-        if filtered_cash:
-            st.dataframe(pd.DataFrame(filtered_cash)[['date','desc','amount','category','paid_by','receipt']],use_container_width=True,hide_index=True)
-            st.metric("Cash ITC",f"${sum(e['itc'] for e in filtered_cash):.2f}")
-            if st.button("🗑️ Clear All"): DB['cash_expenses'] = []; save_and_rerun()
-        elif DB['cash_expenses']:
-            st.warning(f"📅 {len(DB['cash_expenses'])} entries saved but outside current date filter.")
-
-elif page == "🏦 Personal Account":
-    st.header("🏦 Personal Bank/CC Expenses")
-    st.warning("⚠️ Corp should reimburse OR track as shareholder loan")
-    c1,c2 = st.columns(2)
-    with c1:
-        with st.form("pers",clear_on_submit=True):
-            dt = st.date_input("Date",key="pd")
-            desc = st.text_input("Description",key="pdesc")
-            amt = st.number_input("Amount ($)",min_value=0.0,step=0.01,key="pamt")
-            cat = st.selectbox("Category",[c for c in CATEGORIES if c not in ['Revenue - Oilfield Services','Shareholder Distribution','Personal Expense','Tax Payment','Exclude']])
-            who = st.selectbox("Paid From",[f"{sh1}'s Personal",f"{sh2}'s Personal"])
-            receipt = st.text_input("Receipt # or Link",placeholder="e.g., R-001")
-            if st.form_submit_button("➕ Add",type="primary") and amt > 0:
-                rate = 0.5 if '50%' in cat else 1.0
-                DB['personal_expenses'].append({'date':str(dt),'desc':desc,'amount':amt,'category':cat,'paid_from':who,'receipt':receipt,'itc':amt*0.05/1.05*rate})
-                save_and_rerun()
-    with c2:
-        st.subheader(f"Personal Expenses ({len(DB['personal_expenses'])} total saved)")
-        filtered_pers = filter_by_date(DB['personal_expenses'], 'date', start_date, end_date)
-        if filtered_pers:
-            st.dataframe(pd.DataFrame(filtered_pers)[['date','desc','amount','category','paid_from','receipt']],use_container_width=True,hide_index=True)
-            st.metric("Personal Acct ITC",f"${sum(e['itc'] for e in filtered_pers):.2f}")
-            if st.button("🗑️ Clear"): DB['personal_expenses'] = []; save_and_rerun()
-        elif DB['personal_expenses']:
-            st.warning(f"📅 {len(DB['personal_expenses'])} entries saved but outside current date filter.")
-
-elif page == "🏠 Home Office":
-    st.header("🏠 Home Office - Detailed Breakdown")
-    st.info("💡 CRA: Utilities ARE claimable! Calculate: Office sq ft ÷ Total sq ft x Expenses")
-    ho = DB['home_office']
-    c1,c2 = st.columns(2)
-    with c1:
-        st.subheader("Housing Costs (Annual)")
-        ho['rent'] = st.number_input("Rent OR Mortgage Interest ($)",value=float(ho['rent']),step=100.0)
-        ho['property_tax'] = st.number_input("Property Tax ($)",value=float(ho['property_tax']),step=100.0)
-        ho['insurance'] = st.number_input("Home Insurance ($)",value=float(ho['insurance']),step=50.0)
-    with c2:
-        st.subheader("Utilities (Annual)")
-        ho['electricity'] = st.number_input("Electricity ($)",value=float(ho['electricity']),step=50.0)
-        ho['gas'] = st.number_input("Gas/Heating ($)",value=float(ho['gas']),step=50.0)
-        ho['water'] = st.number_input("Water ($)",value=float(ho['water']),step=50.0)
-        ho['internet'] = st.number_input("Internet ($)",value=float(ho['internet']),step=50.0)
-    ho['pct'] = st.slider("Office % of Home",0,50,ho['pct'])
-    items = [('Rent/Mortgage Interest',ho['rent']),('Property Tax',ho['property_tax']),('Home Insurance',ho['insurance']),('Electricity',ho['electricity']),('Gas/Heating',ho['gas']),('Water',ho['water']),('Internet',ho['internet'])]
+def load_cibc_csv(content):
+    """Parse CIBC CSV format into a DataFrame."""
+    lines = content.strip().split('\n')
     data = []
-    for name,amt in items:
-        if amt > 0:
-            ded = amt*ho['pct']/100
-            data.append({'Expense':name,'Annual':f"${amt:,.2f}",f"Business ({ho['pct']}%)":f"${ded:,.2f}",'ITC':f"${ded*0.05/1.05:.2f}"})
-    if data: st.table(pd.DataFrame(data))
-    total = sum(x[1] for x in items)
-    total_ded = total*ho['pct']/100
-    c1,c2,c3 = st.columns(3)
-    c1.metric("Total Home Costs",f"${total:,.2f}")
-    c2.metric(f"Deductible ({ho['pct']}%)",f"${total_ded:,.2f}")
-    c3.metric("Home Office ITC",f"${total_ded*0.05/1.05:.2f}")
-    if st.button("💾 Save Home Office",type="primary"):
-        DB['home_office'] = ho
-        persist()
-        st.success("✅ Saved!")
+    for line in lines:
+        if not line.strip():
+            continue
+        parts = line.split(',')
+        if len(parts) >= 3:
+            try:
+                date_str = parts[0].strip().strip('"')
+                date = pd.to_datetime(date_str).strftime('%Y-%m-%d')
+                desc = parts[1].strip().strip('"')
+                debit = float(parts[2].strip().strip('"')) if parts[2].strip().strip('"') else 0
+                credit = float(parts[3].strip().strip('"')) if len(parts) > 3 and parts[3].strip().strip('"') else 0
+                data.append({'date': date, 'description': desc, 'debit': abs(debit), 'credit': abs(credit)})
+            except:
+                continue
+    return pd.DataFrame(data) if data else pd.DataFrame(columns=['date','description','debit','credit'])
+
+
+# ════════════════════════════════════════════════════════════════════════════
+#  SIDEBAR
+# ════════════════════════════════════════════════════════════════════════════
+
+fy_start, fy_end = st.session_state.fiscal_year.split('-')
+
+st.sidebar.title("🛢️ RigBooks")
+st.sidebar.markdown(f"**Cape Bretoner's Oilfield Services**")
+st.sidebar.markdown(f"FY {st.session_state.fiscal_year} (Dec 1, {fy_start} → Nov 30, {fy_end})")
+st.sidebar.markdown("---")
+st.sidebar.markdown("👨 Greg: 51% | 👩 Lilibeth: 49%")
+st.sidebar.markdown("---")
+
+# Data status indicator
+has_bank = st.session_state.corporate_df is not None
+has_classified = st.session_state.classified_df is not None
+n_cash = len(st.session_state.cash_expenses)
+n_personal = len(st.session_state.personal_expenses)
+
+st.sidebar.markdown("**Data Status:**")
+st.sidebar.markdown(f"{'✅' if has_bank else '❌'} Bank Statement")
+st.sidebar.markdown(f"{'✅' if has_classified else '❌'} Classified")
+st.sidebar.markdown(f"{'✅' if n_cash > 0 else '⬜'} Cash Expenses ({n_cash})")
+st.sidebar.markdown(f"{'✅' if n_personal > 0 else '⬜'} Personal Exp ({n_personal})")
+st.sidebar.markdown("---")
+
+page = st.sidebar.radio("Navigation", [
+    "📤 Upload & Process",
+    "💰 Revenue",
+    "💵 Cash Expenses",
+    "💳 Personal Bank/CC",
+    "🚗 Vehicle & Mileage",
+    "📱 Phone Bills",
+    "📦 Other Expenses",
+    "💰 GST Filing",
+    "👥 Shareholders",
+    "📋 Summary",
+    "📧 Export for Accountant",
+])
+
+
+# ════════════════════════════════════════════════════════════════════════════
+#  PAGE: UPLOAD & PROCESS
+# ════════════════════════════════════════════════════════════════════════════
+
+if page == "📤 Upload & Process":
+    st.title("📤 Upload & Process Bank Statement")
+    st.caption(f"Fiscal Year: Dec 1, {fy_start} → Nov 30, {fy_end}")
+
+    # Show existing data
+    if st.session_state.corporate_df is not None:
+        st.success(f"✅ Bank statement loaded: {len(st.session_state.corporate_df)} transactions (saved to disk)")
+        if st.session_state.classified_df is not None:
+            st.success(f"✅ Classified: {len(st.session_state.classified_df)} transactions")
+
+        with st.expander("⚠️ Clear & Re-upload"):
+            if st.button("🗑️ Clear All Bank Data", type="secondary"):
+                st.session_state.corporate_df = None
+                st.session_state.classified_df = None
+                for f in ['corporate_df.pkl', 'classified_df.pkl', 'corporate_backup.csv', 'classified_backup.csv']:
+                    p = data_dir() / f
+                    if p.exists():
+                        p.unlink()
+                st.rerun()
+
+    # Upload
+    corp_file = st.file_uploader("Upload Corporate Bank Statement (CIBC CSV)", type=['csv'], key='csv_upload')
+
+    if corp_file:
+        content = corp_file.getvalue().decode('utf-8', errors='replace')
+        df = load_cibc_csv(content)
+
+        if df.empty:
+            st.error("Could not parse CSV. Check format.")
+        else:
+            st.session_state.corporate_df = df
+            save_df('corporate_df.pkl', df)
+            save_csv_backup('corporate_backup.csv', df)
+            st.success(f"✅ Loaded & SAVED {len(df)} transactions to disk!")
+            st.info(f"💾 Saved: data/{st.session_state.fiscal_year}/corporate_df.pkl")
+
+            # Auto-classify immediately
+            with st.spinner("Classifying transactions..."):
+                classified = classify_dataframe(df)
+                st.session_state.classified_df = classified
+                save_df('classified_df.pkl', classified)
+                save_csv_backup('classified_backup.csv', classified)
+
+            st.success(f"✅ Classified & SAVED {len(classified)} transactions!")
+
+            # Show summary
+            cats = classified['cra_category'].value_counts()
+            st.markdown("### Classification Summary")
+            st.dataframe(cats.reset_index().rename(columns={'index': 'Category', 'cra_category': 'Category', 'count': 'Count'}))
+            st.balloons()
+
+    # Manual re-classify button
+    if st.session_state.corporate_df is not None and st.session_state.classified_df is not None:
+        if st.button("🔄 Re-classify All Transactions"):
+            with st.spinner("Re-classifying..."):
+                classified = classify_dataframe(st.session_state.corporate_df)
+                st.session_state.classified_df = classified
+                save_df('classified_df.pkl', classified)
+                save_csv_backup('classified_backup.csv', classified)
+            st.success("✅ Re-classified and saved!")
+            st.rerun()
+
+    # Show classified data
+    if st.session_state.classified_df is not None:
+        st.markdown("### All Transactions")
+        display_cols = ['date', 'description', 'debit', 'credit', 'cra_category', 'itc_amount']
+        cols_available = [c for c in display_cols if c in st.session_state.classified_df.columns]
+        st.dataframe(st.session_state.classified_df[cols_available], use_container_width=True, height=400)
+
+
+# ════════════════════════════════════════════════════════════════════════════
+#  PAGE: REVENUE — with inline re-classification + auto-save
+# ════════════════════════════════════════════════════════════════════════════
+
+elif page == "💰 Revenue":
+    st.title(f"💰 Revenue — FY {st.session_state.fiscal_year}")
+
+    if st.session_state.classified_df is None:
+        st.warning("⚠️ Upload and process a bank statement first.")
+        st.stop()
+
+    df = st.session_state.classified_df.copy()
+    credits = df[df['credit'] > 0].copy()
+
+    # Revenue breakdown
+    wire_mask = credits['description'].str.contains('WIRE TSF', case=False, na=False)
+    mobile_mask = credits['description'].str.contains('MOBILE DEP', case=False, na=False) & ~wire_mask
+    branch_mask = credits['description'].str.contains('BRANCH DEP|DEPOSIT', case=False, na=False) & ~wire_mask & ~mobile_mask
+    etransfer_mask = credits['description'].str.contains('E-TRANSFER|INTERAC', case=False, na=False) & ~wire_mask & ~mobile_mask & ~branch_mask
+    other_mask = ~wire_mask & ~mobile_mask & ~branch_mask & ~etransfer_mask
+
+    wire_total = credits[wire_mask]['credit'].sum()
+    mobile_total = credits[mobile_mask]['credit'].sum()
+    branch_total = credits[branch_mask]['credit'].sum()
+    etransfer_total = credits[etransfer_mask]['credit'].sum()
+    other_total = credits[other_mask]['credit'].sum()
+    grand_total = credits['credit'].sum()
+
+    # Metrics
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Wire Transfers", f"${wire_total:,.2f}")
+    col2.metric("Mobile Deposits", f"${mobile_total:,.2f}")
+    col3.metric("Branch Deposits", f"${branch_total:,.2f}")
+    col4.metric("E-Transfers", f"${etransfer_total:,.2f}")
+
+    st.metric("TOTAL REVENUE", f"${grand_total:,.2f}")
+    st.metric("GST Collected (5%)", f"${grand_total * 0.05:,.2f}")
+
+    # Detail tables
+    for label, mask in [("Wire Transfers (Long Run / PWC)", wire_mask),
+                        ("Mobile Deposits", mobile_mask),
+                        ("Branch Deposits", branch_mask),
+                        ("E-Transfers", etransfer_mask),
+                        ("Other Credits", other_mask)]:
+        subset = credits[mask]
+        if not subset.empty:
+            with st.expander(f"{label} ({len(subset)} transactions — ${subset['credit'].sum():,.2f})"):
+                st.dataframe(subset[['date','description','credit']].reset_index(drop=True), use_container_width=True)
+
+    # Re-classify individual transactions
+    st.markdown("---")
+    st.markdown("### Reclassify a Transaction")
+    st.caption("Change a transaction's category and it auto-saves immediately.")
+
+    all_cats = ['Revenue'] + sorted(CRA_CATEGORIES.keys())
+    edit_df = df.copy().reset_index(drop=True)
+
+    txn_options = [f"{r['date']} | {r['description'][:40]} | D:{r['debit']:.2f} C:{r['credit']:.2f}" for _, r in edit_df.iterrows()]
+    selected_txn = st.selectbox("Select transaction", txn_options, key="rev_reclass_select")
+
+    if selected_txn:
+        idx = txn_options.index(selected_txn)
+        current_cat = edit_df.loc[idx, 'cra_category'] if 'cra_category' in edit_df.columns else 'Other / Unclassified'
+        new_cat = st.selectbox("New category", all_cats, index=all_cats.index(current_cat) if current_cat in all_cats else 0, key="rev_new_cat")
+
+        if st.button("💾 Save Reclassification", type="primary", key="rev_save_btn"):
+            st.session_state.classified_df.loc[idx, 'cra_category'] = new_cat
+            if new_cat in CRA_CATEGORIES:
+                pct = CRA_CATEGORIES[new_cat]['itc_pct']
+            elif new_cat == 'Revenue':
+                pct = 0.0
+            else:
+                pct = 1.0
+            st.session_state.classified_df.loc[idx, 'itc_pct'] = pct
+            debit = st.session_state.classified_df.loc[idx, 'debit']
+            st.session_state.classified_df.loc[idx, 'itc_amount'] = debit * pct * 0.05 / 1.05
+            save_df('classified_df.pkl', st.session_state.classified_df)
+            save_csv_backup('classified_backup.csv', st.session_state.classified_df)
+            st.success(f"✅ Saved! Transaction reclassified to '{new_cat}'")
+            st.rerun()
+
+
+# ════════════════════════════════════════════════════════════════════════════
+#  PAGE: CASH EXPENSES — auto-save every entry
+# ════════════════════════════════════════════════════════════════════════════
+
+elif page == "💵 Cash Expenses":
+    st.title(f"💵 Cash Expenses — FY {st.session_state.fiscal_year}")
+    st.caption("Expenses paid in cash (not in bank statement). Auto-saves on add/delete.")
+
+    st.info("**CRA Receipt Rules:** Under $30: statement OK | $30-$150: keep receipt | Over $150: receipt REQUIRED")
+
+    # Add new expense
+    with st.form("add_cash", clear_on_submit=True):
+        st.markdown("### Add Cash Expense")
+        c1, c2 = st.columns(2)
+        with c1:
+            cash_date = st.date_input("Date")
+            cash_desc = st.text_input("Description", placeholder="e.g., Safety boots from Marks")
+            cash_amount = st.number_input("Amount ($)", min_value=0.0, step=0.01)
+        with c2:
+            cash_cat = st.selectbox("Category", [
+                'Fuel & Petroleum', 'Vehicle Repairs', 'Meals (50% ITC)',
+                'Equipment & Supplies', 'Professional Fees', 'Training & Certifications',
+                'PPE & Safety', 'Software & Subscriptions', 'Office Expenses', 'Other'
+            ])
+            cash_receipt = st.checkbox("Has receipt?", value=True)
+
+        submitted = st.form_submit_button("➕ Add & Save", type="primary")
+        if submitted and cash_amount > 0 and cash_desc:
+            entry = {
+                'date': cash_date.strftime('%Y-%m-%d'),
+                'description': cash_desc,
+                'amount': cash_amount,
+                'category': cash_cat,
+                'has_receipt': cash_receipt,
+                'added': datetime.now().strftime('%Y-%m-%d %H:%M')
+            }
+            st.session_state.cash_expenses.append(entry)
+            save_json('cash_expenses.json', st.session_state.cash_expenses)
+            st.success(f"✅ Saved! {cash_desc} — ${cash_amount:.2f}")
+            st.rerun()
+
+    # Display existing
+    if st.session_state.cash_expenses:
+        st.markdown("### Recorded Cash Expenses")
+        cash_df = pd.DataFrame(st.session_state.cash_expenses)
+        cash_df['itc'] = cash_df['amount'] * 0.05 / 1.05
+        # Meals at 50%
+        meals_mask = cash_df['category'].str.contains('Meal', case=False, na=False)
+        cash_df.loc[meals_mask, 'itc'] = cash_df.loc[meals_mask, 'amount'] * 0.5 * 0.05 / 1.05
+
+        st.dataframe(cash_df[['date','description','category','amount','itc','has_receipt']], use_container_width=True)
+
+        total = cash_df['amount'].sum()
+        total_itc = cash_df['itc'].sum()
+        c1, c2 = st.columns(2)
+        c1.metric("Total Cash Expenses", f"${total:,.2f}")
+        c2.metric("Total ITCs", f"${total_itc:,.2f}")
+
+        # Delete
+        st.markdown("### Delete an Entry")
+        del_options = [f"{e['date']} | {e['description']} | ${e['amount']:.2f}" for e in st.session_state.cash_expenses]
+        del_sel = st.selectbox("Select to delete", del_options, key="cash_del")
+        if st.button("🗑️ Delete & Save", key="cash_del_btn"):
+            idx = del_options.index(del_sel)
+            st.session_state.cash_expenses.pop(idx)
+            save_json('cash_expenses.json', st.session_state.cash_expenses)
+            st.success("Deleted and saved!")
+            st.rerun()
+    else:
+        st.info("No cash expenses recorded yet.")
+
+
+# ════════════════════════════════════════════════════════════════════════════
+#  PAGE: PERSONAL BANK/CC EXPENSES
+# ════════════════════════════════════════════════════════════════════════════
+
+elif page == "💳 Personal Bank/CC":
+    st.title(f"💳 Personal Bank/CC Business Expenses — FY {st.session_state.fiscal_year}")
+    st.caption("Business expenses paid from personal bank or credit card. Auto-saves.")
+
+    with st.form("add_personal", clear_on_submit=True):
+        st.markdown("### Add Personal Bank/CC Expense")
+        c1, c2 = st.columns(2)
+        with c1:
+            p_date = st.date_input("Date", key="p_date")
+            p_desc = st.text_input("Description", placeholder="e.g., Home Depot - plywood for rig", key="p_desc")
+            p_amount = st.number_input("Amount ($)", min_value=0.0, step=0.01, key="p_amt")
+        with c2:
+            p_cat = st.selectbox("Category", [
+                'Fuel & Petroleum', 'Vehicle Repairs', 'Meals (50% ITC)',
+                'Equipment & Supplies', 'Professional Fees', 'Training & Certifications',
+                'PPE & Safety', 'Software & Subscriptions', 'Office Expenses', 'Other'
+            ], key="p_cat")
+            p_receipt = st.checkbox("Has receipt?", value=True, key="p_receipt")
+            p_card = st.text_input("Card/Account used", placeholder="e.g., Visa ending 4532", key="p_card")
+
+        submitted = st.form_submit_button("➕ Add & Save", type="primary")
+        if submitted and p_amount > 0 and p_desc:
+            entry = {
+                'date': p_date.strftime('%Y-%m-%d'),
+                'description': p_desc,
+                'amount': p_amount,
+                'category': p_cat,
+                'has_receipt': p_receipt,
+                'card': p_card,
+                'added': datetime.now().strftime('%Y-%m-%d %H:%M')
+            }
+            st.session_state.personal_expenses.append(entry)
+            save_json('personal_expenses.json', st.session_state.personal_expenses)
+            st.success(f"✅ Saved! {p_desc} — ${p_amount:.2f}")
+            st.rerun()
+
+    if st.session_state.personal_expenses:
+        st.markdown("### Recorded Personal Bank/CC Expenses")
+        p_df = pd.DataFrame(st.session_state.personal_expenses)
+        p_df['itc'] = p_df['amount'] * 0.05 / 1.05
+        meals_mask = p_df['category'].str.contains('Meal', case=False, na=False)
+        p_df.loc[meals_mask, 'itc'] = p_df.loc[meals_mask, 'amount'] * 0.5 * 0.05 / 1.05
+
+        st.dataframe(p_df[['date','description','category','amount','itc','has_receipt','card']], use_container_width=True)
+
+        c1, c2 = st.columns(2)
+        c1.metric("Total Personal Expenses", f"${p_df['amount'].sum():,.2f}")
+        c2.metric("Total ITCs", f"${p_df['itc'].sum():,.2f}")
+
+        del_options = [f"{e['date']} | {e['description']} | ${e['amount']:.2f}" for e in st.session_state.personal_expenses]
+        del_sel = st.selectbox("Delete an entry", del_options, key="p_del")
+        if st.button("🗑️ Delete & Save", key="p_del_btn"):
+            idx = del_options.index(del_sel)
+            st.session_state.personal_expenses.pop(idx)
+            save_json('personal_expenses.json', st.session_state.personal_expenses)
+            st.success("Deleted and saved!")
+            st.rerun()
+    else:
+        st.info("No personal bank/CC expenses recorded yet.")
+
+
+# ════════════════════════════════════════════════════════════════════════════
+#  PAGE: VEHICLE & MILEAGE
+# ════════════════════════════════════════════════════════════════════════════
 
 elif page == "🚗 Vehicle & Mileage":
-    st.header("🚗 Vehicle Expenses & Mileage Log")
-    tab1, tab2 = st.tabs(["💳 Vehicle Expenses", "📏 Mileage Log"])
-    with tab1:
-        c1,c2 = st.columns(2)
-        with c1:
-            with st.form("veh",clear_on_submit=True):
-                desc = st.text_input("Description",placeholder="e.g., Mazda loan Jan 2025")
-                vcat = st.selectbox("Type",["Loan/Lease Payment","Fuel","Insurance","Repairs","Registration","Other"])
-                amt = st.number_input("Amount ($)",min_value=0.0,step=0.01)
-                period = st.text_input("Period",placeholder="e.g., Jan 2025")
-                vehicle = st.text_input("Vehicle",placeholder="e.g., 2019 Mazda CX-5")
-                biz = st.slider("Business %",0,100,50)
-                if st.form_submit_button("➕ Add",type="primary") and amt > 0:
-                    ded = amt*biz/100
-                    DB['vehicle_expenses'].append({'desc':desc,'type':vcat,'amount':amt,'period':period,'vehicle':vehicle,'biz_pct':biz,'deductible':ded,'itc':ded*0.05/1.05})
-                    save_and_rerun()
-        with c2:
-            st.subheader(f"Vehicle Expenses ({len(DB['vehicle_expenses'])} saved)")
-            if DB['vehicle_expenses']:
-                for i,v in enumerate(DB['vehicle_expenses']):
-                    col1,col2,col3 = st.columns([3,2,1])
-                    col1.write(f"{v['desc']}: ${v['amount']:.2f}")
-                    col2.write(f"ITC: ${v['itc']:.2f}")
-                    if col3.button("🗑️",key=f"dv{i}"): DB['vehicle_expenses'].pop(i); save_and_rerun()
-                st.metric("Vehicle ITC",f"${sum(v['itc'] for v in DB['vehicle_expenses']):.2f}")
-    with tab2:
-        st.info("💡 CRA Rates 2025: $0.72/km first 5,000km, $0.66/km after")
-        st.markdown("📏 **[Detailed Mileage Log 2025](https://www.dropbox.com/scl/fo/7gpryeh93mgky0ybwn66c/AFgO-qdS7aSDhqNlXqX6bks?rlkey=529qzmdiamtdoxhpacfcxsn4v&st=mzzlyssr&dl=0)**")
-        c1,c2 = st.columns(2)
-        with c1:
-            with st.form("mileage",clear_on_submit=True):
-                m_date = st.date_input("Date",key="m_date")
-                m_biz_km = st.number_input("Business KM",min_value=0,step=1)
-                m_total_km = st.number_input("Total KM (odometer)",min_value=0,step=1)
-                if st.form_submit_button("➕ Add",type="primary") and m_total_km > 0:
-                    DB['mileage'].append({'date':str(m_date),'business_km':m_biz_km,'total_km':m_total_km})
-                    save_and_rerun()
-        with c2:
-            st.subheader(f"Mileage ({len(DB['mileage'])} entries saved)")
-            filtered_mileage = filter_by_date(DB['mileage'], 'date', start_date, end_date)
-            if filtered_mileage:
-                total_biz_km = sum(m['business_km'] for m in filtered_mileage)
-                total_km = max(m['total_km'] for m in filtered_mileage) - min(m['total_km'] for m in filtered_mileage) if len(filtered_mileage) > 1 else filtered_mileage[0]['total_km']
-                if total_km == 0: total_km = sum(m['total_km'] for m in filtered_mileage)
-                biz_pct = (total_biz_km / total_km * 100) if total_km > 0 else 0
-                c1,c2,c3 = st.columns(3)
-                c1.metric("Business KM",f"{total_biz_km:,}")
-                c2.metric("Total KM",f"{total_km:,}")
-                c3.metric("Business %",f"{biz_pct:.1f}%")
-                cra_ded = (5000*0.72)+((total_biz_km-5000)*0.66) if total_biz_km > 5000 else total_biz_km*0.72
-                st.metric("CRA Mileage Deduction",f"${cra_ded:,.2f}")
-                if st.button("🗑️ Clear Mileage"): DB['mileage'] = []; save_and_rerun()
+    st.title(f"🚗 Vehicle & Mileage — FY {st.session_state.fiscal_year}")
+    st.caption("CRA-compliant vehicle log. All changes auto-save.")
 
-elif page == "📚 Other Expenses":
-    st.header("📚 Other Expenses - Training, PPE, Software")
-    c1,c2 = st.columns(2)
+    vm = st.session_state.vehicle_mileage
+
+    # Odometer & fuel summary
+    st.markdown("### Vehicle Summary")
+    c1, c2, c3 = st.columns(3)
     with c1:
-        with st.form("other",clear_on_submit=True):
-            dt = st.date_input("Date",key="od")
-            desc = st.text_input("Description",placeholder="e.g., H2S Alive cert")
-            cat = st.selectbox("Category",["Training & Certifications","Safety Gear & PPE","Software & Subscriptions","Professional Fees","Office Supplies","Travel & Accommodations","Other Business"])
-            amt = st.number_input("Amount ($)",min_value=0.0,step=0.01,key="oamt")
-            if st.form_submit_button("➕ Add",type="primary") and amt > 0:
-                DB['other_expenses'].append({'date':str(dt),'desc':desc,'category':cat,'amount':amt,'itc':amt*0.05/1.05})
-                save_and_rerun()
+        new_start = st.number_input("Start Odometer (km)", value=int(vm.get('start_odo', 0)), step=1, key="vm_start")
     with c2:
-        st.subheader(f"Other Expenses ({len(DB['other_expenses'])} total saved)")
-        filtered_other = filter_by_date(DB['other_expenses'], 'date', start_date, end_date)
-        if filtered_other:
-            st.dataframe(pd.DataFrame(filtered_other)[['date','desc','category','amount']],use_container_width=True,hide_index=True)
-            st.metric("Other ITC",f"${sum(e['itc'] for e in filtered_other):.2f}")
-            if st.button("🗑️ Clear"): DB['other_expenses'] = []; save_and_rerun()
-        elif DB['other_expenses']:
-            st.warning(f"📅 {len(DB['other_expenses'])} entries saved but outside current date filter.")
+        new_end = st.number_input("End Odometer (km)", value=int(vm.get('end_odo', 0)), step=1, key="vm_end")
+    with c3:
+        new_fuel = st.number_input("Total Fuel Charges ($)", value=float(vm.get('fuel_total', 0)), step=0.01, key="vm_fuel")
+
+    if st.button("💾 Save Vehicle Summary", type="primary", key="vm_save"):
+        vm['start_odo'] = new_start
+        vm['end_odo'] = new_end
+        vm['fuel_total'] = new_fuel
+        st.session_state.vehicle_mileage = vm
+        save_json('vehicle_mileage.json', vm)
+        st.success("✅ Vehicle summary saved!")
+
+    total_km = new_end - new_start
+    cost_per_km = new_fuel / total_km if total_km > 0 else 0
+    st.markdown(f"**Total Distance:** {total_km:,} km | **Cost/km:** ${cost_per_km:.4f} | **Business Use:** 100%")
+
+    # Add trip
+    st.markdown("---")
+    with st.form("add_trip", clear_on_submit=True):
+        st.markdown("### Log a Trip")
+        t1, t2, t3 = st.columns(3)
+        with t1:
+            trip_date = st.date_input("Date", key="trip_date")
+            trip_from = st.text_input("From", placeholder="Sherwood Park", key="trip_from")
+        with t2:
+            trip_to = st.text_input("To", placeholder="Redwater Oilfields", key="trip_to")
+            trip_km = st.number_input("Distance (km)", min_value=0.0, step=0.1, key="trip_km")
+        with t3:
+            trip_purpose = st.text_input("Purpose", placeholder="Daily operations - Long Run", key="trip_purpose")
+            trip_odo = st.number_input("Odometer reading", min_value=0, step=1, key="trip_odo")
+
+        if st.form_submit_button("➕ Add Trip & Save", type="primary"):
+            trip = {
+                'date': trip_date.strftime('%Y-%m-%d'),
+                'from': trip_from, 'to': trip_to,
+                'km': trip_km, 'purpose': trip_purpose,
+                'odometer': trip_odo,
+                'added': datetime.now().strftime('%Y-%m-%d %H:%M')
+            }
+            vm['trips'].append(trip)
+            st.session_state.vehicle_mileage = vm
+            save_json('vehicle_mileage.json', vm)
+            st.success(f"✅ Trip saved! {trip_from} → {trip_to}")
+            st.rerun()
+
+    if vm['trips']:
+        st.markdown("### Trip Log")
+        trip_df = pd.DataFrame(vm['trips'])
+        st.dataframe(trip_df, use_container_width=True)
+        st.metric("Total Logged Trips", len(vm['trips']))
+
+        del_options = [f"{t['date']} | {t.get('from','')} → {t.get('to','')} | {t.get('km',0)} km" for t in vm['trips']]
+        del_sel = st.selectbox("Delete a trip", del_options, key="trip_del")
+        if st.button("🗑️ Delete Trip & Save", key="trip_del_btn"):
+            idx = del_options.index(del_sel)
+            vm['trips'].pop(idx)
+            st.session_state.vehicle_mileage = vm
+            save_json('vehicle_mileage.json', vm)
+            st.success("Deleted and saved!")
+            st.rerun()
+
+
+# ════════════════════════════════════════════════════════════════════════════
+#  PAGE: PHONE BILLS
+# ════════════════════════════════════════════════════════════════════════════
+
+elif page == "📱 Phone Bills":
+    st.title(f"📱 Phone Bills — FY {st.session_state.fiscal_year}")
+    st.caption("Monthly phone bills for Greg & Lilibeth. Auto-saves on every change.")
+
+    MONTHS = ['Dec','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov']
+    phone = st.session_state.phone_bill
+    changed = False
+
+    for person, label in [('greg', '👨 Greg MacDonald'), ('lilibeth', '👩 Lilibeth Sejera')]:
+        st.markdown(f"### {label}")
+        person_data = phone.get(person, {'months': {m: 0.0 for m in MONTHS}, 'business_pct': 100})
+        months = person_data.get('months', {m: 0.0 for m in MONTHS})
+
+        cols = st.columns(6)
+        for i, m in enumerate(MONTHS):
+            with cols[i % 6]:
+                val = st.number_input(f"{m}", value=float(months.get(m, 0)), step=0.01,
+                                      key=f"phone_{person}_{m}", min_value=0.0)
+                if val != months.get(m, 0):
+                    months[m] = val
+                    changed = True
+
+        biz_pct = st.slider(f"{label.split(' ')[1]} Business %", 0, 100,
+                            int(person_data.get('business_pct', 100)), key=f"phone_pct_{person}")
+        if biz_pct != person_data.get('business_pct', 100):
+            changed = True
+
+        annual = sum(months.values())
+        deductible = annual * biz_pct / 100
+        itc = deductible * 0.05 / 1.05
+
+        phone[person] = {'months': months, 'business_pct': biz_pct}
+
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Annual Total", f"${annual:,.2f}")
+        c2.metric("Deductible", f"${deductible:,.2f}")
+        c3.metric("ITC", f"${itc:,.2f}")
+        st.markdown("---")
+
+    # Combined
+    greg_ded = sum(phone['greg']['months'].values()) * phone['greg']['business_pct'] / 100
+    lili_ded = sum(phone['lilibeth']['months'].values()) * phone['lilibeth']['business_pct'] / 100
+    combined_itc = (greg_ded + lili_ded) * 0.05 / 1.05
+
+    st.markdown("### Combined Phone Deductions")
+    c1, c2 = st.columns(2)
+    c1.metric("Total Deductible", f"${greg_ded + lili_ded:,.2f}")
+    c2.metric("Total ITC", f"${combined_itc:,.2f}")
+
+    if st.button("💾 Save Phone Bills", type="primary"):
+        st.session_state.phone_bill = phone
+        save_json('phone_bill.json', phone)
+        st.success("✅ Phone bills saved to disk!")
+
+    if changed:
+        st.session_state.phone_bill = phone
+        save_json('phone_bill.json', phone)
+
+
+# ════════════════════════════════════════════════════════════════════════════
+#  PAGE: OTHER EXPENSES — Training, PPE, Software, etc.
+# ════════════════════════════════════════════════════════════════════════════
+
+elif page == "📦 Other Expenses":
+    st.title(f"📦 Other Expenses — FY {st.session_state.fiscal_year}")
+    st.caption("Training, PPE, Software, and miscellaneous. Auto-saves on add/delete.")
+
+    other = st.session_state.other_expenses
+    sub_cats = {
+        'training': '🎓 Training & Certifications',
+        'ppe': '🦺 PPE & Safety Equipment',
+        'software': '💻 Software & Subscriptions',
+        'other': '📎 Other Business Expenses'
+    }
+
+    tab_keys = list(sub_cats.keys())
+    tabs = st.tabs(list(sub_cats.values()))
+
+    for tab, key in zip(tabs, tab_keys):
+        with tab:
+            items = other.get(key, [])
+
+            with st.form(f"add_{key}", clear_on_submit=True):
+                c1, c2 = st.columns(2)
+                with c1:
+                    o_date = st.date_input("Date", key=f"o_date_{key}")
+                    o_desc = st.text_input("Description", key=f"o_desc_{key}")
+                with c2:
+                    o_amount = st.number_input("Amount ($)", min_value=0.0, step=0.01, key=f"o_amt_{key}")
+                    o_receipt = st.checkbox("Has receipt?", value=True, key=f"o_rec_{key}")
+
+                if st.form_submit_button(f"➕ Add {sub_cats[key].split(' ', 1)[1]}", type="primary"):
+                    if o_amount > 0 and o_desc:
+                        entry = {
+                            'date': o_date.strftime('%Y-%m-%d'),
+                            'description': o_desc,
+                            'amount': o_amount,
+                            'has_receipt': o_receipt,
+                            'added': datetime.now().strftime('%Y-%m-%d %H:%M')
+                        }
+                        other[key].append(entry)
+                        st.session_state.other_expenses = other
+                        save_json('other_expenses.json', other)
+                        st.success(f"✅ Saved! {o_desc} — ${o_amount:.2f}")
+                        st.rerun()
+
+            if items:
+                o_df = pd.DataFrame(items)
+                o_df['itc'] = o_df['amount'] * 0.05 / 1.05
+                st.dataframe(o_df, use_container_width=True)
+                st.metric(f"Total {sub_cats[key].split(' ', 1)[1]}", f"${o_df['amount'].sum():,.2f}")
+
+                del_opts = [f"{e['date']} | {e['description']} | ${e['amount']:.2f}" for e in items]
+                del_sel = st.selectbox("Delete", del_opts, key=f"del_{key}")
+                if st.button("🗑️ Delete & Save", key=f"del_btn_{key}"):
+                    idx = del_opts.index(del_sel)
+                    other[key].pop(idx)
+                    st.session_state.other_expenses = other
+                    save_json('other_expenses.json', other)
+                    st.success("Deleted and saved!")
+                    st.rerun()
+            else:
+                st.info(f"No {sub_cats[key].split(' ', 1)[1].lower()} recorded yet.")
+
+
+# ════════════════════════════════════════════════════════════════════════════
+#  PAGE: GST FILING
+# ════════════════════════════════════════════════════════════════════════════
 
 elif page == "💰 GST Filing":
-    st.header("💰 GST/HST Return (Form GST34)")
-    st.caption(f"📆 Period: {start_date} to {end_date}")
-    df = DB['transactions']
-    ho = DB['home_office']
-    filtered_rev = filter_by_date(DB['revenue'], 'date', start_date, end_date)
-    manual_revenue = sum(r['amount'] for r in filtered_rev)
-    manual_gst = sum(r['gst_amount'] for r in filtered_rev)
-    bank_revenue = df[df['Category']=='Revenue - Oilfield Services']['Credit'].sum() if not df.empty else 0
-    bank_gst = bank_revenue * 0.05 / 1.05
-    total_revenue = manual_revenue + bank_revenue
-    gst_coll = manual_gst + bank_gst
-    itc_brk = {}
-    if not df.empty:
-        for cat in df['Category'].unique():
-            v = df[df['Category']==cat]['ITC'].sum()
-            if v > 0: itc_brk[f"Bank: {cat}"] = v
-    for p in DB['phone_bills']:
-        k = f"Phone: {p['owner']}"
-        itc_brk[k] = itc_brk.get(k,0) + p['amount']*p['biz_pct']/100*0.05/1.05
-    filtered_cash = filter_by_date(DB['cash_expenses'], 'date', start_date, end_date)
-    for e in filtered_cash: itc_brk[f"Cash: {e['category']}"] = itc_brk.get(f"Cash: {e['category']}",0) + e['itc']
-    filtered_pers = filter_by_date(DB['personal_expenses'], 'date', start_date, end_date)
-    for e in filtered_pers: itc_brk[f"Personal: {e['category']}"] = itc_brk.get(f"Personal: {e['category']}",0) + e['itc']
-    ho_tot = ho['rent']+ho['property_tax']+ho['insurance']+ho['electricity']+ho['gas']+ho['water']+ho['internet']
-    ho_itc = ho_tot*ho['pct']/100*0.05/1.05
-    if ho_itc > 0: itc_brk['Home Office'] = ho_itc
-    for v in DB['vehicle_expenses']: itc_brk[f"Vehicle: {v['type']}"] = itc_brk.get(f"Vehicle: {v['type']}",0) + v['itc']
-    filtered_other = filter_by_date(DB['other_expenses'], 'date', start_date, end_date)
-    for e in filtered_other: itc_brk[f"Other: {e['category']}"] = itc_brk.get(f"Other: {e['category']}",0) + e['itc']
-    total_itc = sum(itc_brk.values())
-    net = gst_coll - total_itc
-    c1,c2 = st.columns(2)
+    st.title(f"💰 GST/HST Filing — FY {st.session_state.fiscal_year}")
+
+    if st.session_state.classified_df is None:
+        st.warning("⚠️ Upload and process a bank statement first.")
+        st.stop()
+
+    df = st.session_state.classified_df
+
+    # Revenue
+    revenue = df[df['credit'] > 0]['credit'].sum()
+    gst_collected = revenue * 0.05
+
+    # Bank ITCs
+    bank_itc = df[df['itc_amount'] > 0]['itc_amount'].sum()
+
+    # Cash ITCs
+    cash_itc = 0
+    for e in st.session_state.cash_expenses:
+        amt = e.get('amount', 0)
+        if 'Meal' in e.get('category', ''):
+            cash_itc += amt * 0.5 * 0.05 / 1.05
+        else:
+            cash_itc += amt * 0.05 / 1.05
+
+    # Personal ITCs
+    personal_itc = 0
+    for e in st.session_state.personal_expenses:
+        amt = e.get('amount', 0)
+        if 'Meal' in e.get('category', ''):
+            personal_itc += amt * 0.5 * 0.05 / 1.05
+        else:
+            personal_itc += amt * 0.05 / 1.05
+
+    # Phone ITCs
+    phone = st.session_state.phone_bill
+    greg_ded = sum(phone.get('greg', {}).get('months', {}).values()) * phone.get('greg', {}).get('business_pct', 100) / 100
+    lili_ded = sum(phone.get('lilibeth', {}).get('months', {}).values()) * phone.get('lilibeth', {}).get('business_pct', 100) / 100
+    phone_itc = (greg_ded + lili_ded) * 0.05 / 1.05
+
+    # Other Expenses ITCs
+    other_itc = 0
+    for key in st.session_state.other_expenses:
+        for e in st.session_state.other_expenses[key]:
+            other_itc += e.get('amount', 0) * 0.05 / 1.05
+
+    total_itc = bank_itc + cash_itc + personal_itc + phone_itc + other_itc
+    net_gst = gst_collected - total_itc
+
+    st.markdown("### GST Summary")
+    st.markdown("---")
+
+    st.markdown("**Revenue & GST Collected**")
+    c1, c2 = st.columns(2)
+    c1.metric("Line 101 — Total Revenue", f"${revenue:,.2f}")
+    c2.metric("Line 105 — GST Collected (5%)", f"${gst_collected:,.2f}")
+
+    st.markdown("---")
+    st.markdown("**Input Tax Credits (ITCs)**")
+    itc_data = {
+        'Bank Statement ITCs': bank_itc,
+        'Cash Expense ITCs': cash_itc,
+        'Personal Bank/CC ITCs': personal_itc,
+        'Phone Bill ITCs': phone_itc,
+        'Other Expense ITCs': other_itc,
+    }
+    for label, val in itc_data.items():
+        c1, c2 = st.columns([3, 1])
+        c1.write(label)
+        c2.write(f"${val:,.2f}")
+
+    st.markdown("---")
+    c1, c2 = st.columns(2)
+    c1.metric("Line 108 — Total ITCs", f"${total_itc:,.2f}")
+    if net_gst > 0:
+        c2.metric("Line 109 — NET GST OWING", f"${net_gst:,.2f}")
+    else:
+        c2.metric("Line 109 — GST REFUND", f"${abs(net_gst):,.2f}")
+
+    # Breakdown by category
+    with st.expander("ITC Breakdown by CRA Category"):
+        if 'cra_category' in df.columns and 'itc_amount' in df.columns:
+            itc_by_cat = df[df['itc_amount'] > 0].groupby('cra_category')['itc_amount'].sum().sort_values(ascending=False)
+            st.dataframe(itc_by_cat.reset_index().rename(columns={'cra_category': 'Category', 'itc_amount': 'ITC Amount'}))
+
+
+# ════════════════════════════════════════════════════════════════════════════
+#  PAGE: SHAREHOLDERS
+# ════════════════════════════════════════════════════════════════════════════
+
+elif page == "👥 Shareholders":
+    st.title(f"👥 Shareholders — FY {st.session_state.fiscal_year}")
+
+    if st.session_state.classified_df is None:
+        st.warning("⚠️ Upload and process a bank statement first.")
+        st.stop()
+
+    df = st.session_state.classified_df
+    revenue = df[df['credit'] > 0]['credit'].sum()
+    total_expenses = df[df['debit'] > 0]['debit'].sum()
+    cash_total = sum(e.get('amount', 0) for e in st.session_state.cash_expenses)
+    personal_total = sum(e.get('amount', 0) for e in st.session_state.personal_expenses)
+    other_total = sum(e.get('amount', 0) for key in st.session_state.other_expenses for e in st.session_state.other_expenses[key])
+
+    net_income = revenue - total_expenses - cash_total - personal_total - other_total
+    greg_share = net_income * 0.51
+    lili_share = net_income * 0.49
+
+    st.markdown("### Income Split")
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Net Income", f"${net_income:,.2f}")
+    c2.metric("Greg (51%)", f"${greg_share:,.2f}")
+    c3.metric("Lilibeth (49%)", f"${lili_share:,.2f}")
+
+    # Shareholder distributions from bank
+    if 'cra_category' in df.columns:
+        dist = df[df['cra_category'] == 'Shareholder Distribution']
+        if not dist.empty:
+            st.markdown("### Shareholder Distributions (from Bank)")
+            st.dataframe(dist[['date','description','debit','credit']], use_container_width=True)
+            st.metric("Total Distributions", f"${dist['debit'].sum():,.2f}")
+
+
+# ════════════════════════════════════════════════════════════════════════════
+#  PAGE: SUMMARY
+# ════════════════════════════════════════════════════════════════════════════
+
+elif page == "📋 Summary":
+    st.title(f"📋 Summary — FY {st.session_state.fiscal_year}")
+
+    if st.session_state.classified_df is None:
+        st.warning("⚠️ Upload and process a bank statement first.")
+        st.stop()
+
+    df = st.session_state.classified_df
+    revenue = df[df['credit'] > 0]['credit'].sum()
+    bank_expenses = df[df['debit'] > 0]['debit'].sum()
+    cash_total = sum(e.get('amount', 0) for e in st.session_state.cash_expenses)
+    personal_total = sum(e.get('amount', 0) for e in st.session_state.personal_expenses)
+    other_total = sum(e.get('amount', 0) for key in st.session_state.other_expenses for e in st.session_state.other_expenses[key])
+
+    st.markdown("### Financial Overview")
+    c1, c2 = st.columns(2)
+    c1.metric("Total Revenue", f"${revenue:,.2f}")
+    c2.metric("Bank Expenses", f"${bank_expenses:,.2f}")
+
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Cash Expenses", f"${cash_total:,.2f}")
+    c2.metric("Personal Bank/CC", f"${personal_total:,.2f}")
+    c3.metric("Other Expenses", f"${other_total:,.2f}")
+
+    all_expenses = bank_expenses + cash_total + personal_total + other_total
+    net = revenue - all_expenses
+    st.metric("NET INCOME", f"${net:,.2f}")
+
+    # Expense breakdown
+    if 'cra_category' in df.columns:
+        st.markdown("### Expenses by CRA Category")
+        exp_by_cat = df[df['debit'] > 0].groupby('cra_category').agg(
+            Count=('debit', 'count'),
+            Total=('debit', 'sum'),
+            ITC=('itc_amount', 'sum')
+        ).sort_values('Total', ascending=False)
+        st.dataframe(exp_by_cat, use_container_width=True)
+
+    # Data files on disk
+    st.markdown("### Data Files on Disk")
+    data_path = data_dir()
+    if data_path.exists():
+        files = list(data_path.iterdir())
+        for f in sorted(files):
+            size = f.stat().st_size
+            st.markdown(f"✅ `{f.name}` — {size:,} bytes")
+
+    # Download all data
+    st.markdown("### Download")
+    c1, c2 = st.columns(2)
     with c1:
-        st.subheader("GST Collected")
-        st.write(f"Manual Revenue: ${manual_revenue:,.2f}")
-        st.write(f"Bank Revenue: ${bank_revenue:,.2f}")
-        st.metric("Total Revenue",f"${total_revenue:,.2f}")
-        st.metric("GST Collected (5%)",f"${gst_coll:,.2f}")
+        st.download_button("📥 All Transactions (CSV)", df.to_csv(index=False),
+                           f"transactions_FY{st.session_state.fiscal_year}.csv", "text/csv")
     with c2:
-        st.subheader("ITCs by Source")
-        for k,v in sorted(itc_brk.items(),key=lambda x:-x[1]):
-            if v > 0.01: st.write(f"- {k}: **${v:,.2f}**")
-        st.markdown(f"### TOTAL ITCs: ${total_itc:,.2f}")
-    st.markdown("---")
-    if net > 0: st.error(f"## 📤 GST OWING: ${net:,.2f}")
-    else: st.success(f"## 📥 GST REFUND: ${abs(net):,.2f}")
+        if 'itc_amount' in df.columns:
+            itc_df = df[df['itc_amount'] > 0][['date','description','debit','cra_category','itc_amount']]
+            st.download_button("📥 ITC Report (CSV)", itc_df.to_csv(index=False),
+                               f"itc_report_FY{st.session_state.fiscal_year}.csv", "text/csv")
 
-elif page == "👥 Shareholder":
-    st.header("👥 Shareholder Loan")
-    st.warning("⚠️ ITA 15(2): Must repay within 1 year or becomes taxable")
-    df = DB['transactions']
-    dist = df[df['Category']=='Shareholder Distribution']['Debit'].sum() if not df.empty else 0
-    pers_corp = df[df['Status']=='personal']['Debit'].sum() if not df.empty else 0
-    sh_owe = dist + pers_corp
-    cash_tot = sum(e['amount'] for e in DB['cash_expenses'])
-    pers_tot = sum(e['amount'] for e in DB['personal_expenses'])
-    phone_tot = sum(p['amount']*p['biz_pct']/100 for p in DB['phone_bills'])
-    corp_owe = cash_tot + pers_tot + phone_tot
-    c1,c2 = st.columns(2)
-    with c1:
-        st.subheader("💸 Corp Owes Shareholders")
-        st.write(f"Cash expenses: ${cash_tot:,.2f}")
-        st.write(f"Personal acct: ${pers_tot:,.2f}")
-        st.write(f"Phone (biz): ${phone_tot:,.2f}")
-        st.metric("Total",f"${corp_owe:,.2f}")
-    with c2:
-        st.subheader("💳 Shareholders Owe Corp")
-        st.write(f"Distributions: ${dist:,.2f}")
-        st.write(f"Personal on corp: ${pers_corp:,.2f}")
-        st.metric("Total",f"${sh_owe:,.2f}")
-    st.markdown("---")
-    net = sh_owe - corp_owe
-    if net > 0:
-        st.warning(f"### Shareholders owe Corp: ${net:,.2f}")
-        st.write(f"{sh1} ({sh1_pct}%): ${net*sh1_pct/100:,.2f}")
-        st.write(f"{sh2} ({100-sh1_pct}%): ${net*(100-sh1_pct)/100:,.2f}")
-    else: st.success(f"### Corp owes Shareholders: ${abs(net):,.2f}")
 
-elif page == "📊 Accountant Summary":
-    st.header("📊 Accountant Summary")
-    st.caption(f"📆 Period: {start_date} to {end_date}")
-    df = DB['transactions']
-    ho = DB['home_office']
-    filtered_rev = filter_by_date(DB['revenue'], 'date', start_date, end_date)
-    manual_revenue = sum(r['amount'] for r in filtered_rev)
-    bank_revenue = df[df['Category']=='Revenue - Oilfield Services']['Credit'].sum() if not df.empty else 0
-    total_revenue = manual_revenue + bank_revenue
-    bank_exp = df[df['Status']=='business']['Debit'].sum() if not df.empty else 0
-    bank_itc = df['ITC'].sum() if not df.empty else 0
-    filtered_cash = filter_by_date(DB['cash_expenses'], 'date', start_date, end_date)
-    cash_exp = sum(e['amount'] for e in filtered_cash)
-    cash_itc = sum(e['itc'] for e in filtered_cash)
-    filtered_pers = filter_by_date(DB['personal_expenses'], 'date', start_date, end_date)
-    pers_exp = sum(e['amount'] for e in filtered_pers)
-    pers_itc = sum(e['itc'] for e in filtered_pers)
-    phone_exp = sum(p['amount']*p['biz_pct']/100 for p in DB['phone_bills'])
-    phone_itc = sum(p['amount']*p['biz_pct']/100*0.05/1.05 for p in DB['phone_bills'])
-    ho_tot = ho['rent']+ho['property_tax']+ho['insurance']+ho['electricity']+ho['gas']+ho['water']+ho['internet']
-    ho_exp = ho_tot*ho['pct']/100
-    ho_itc = ho_exp*0.05/1.05
-    veh_exp = sum(v['deductible'] for v in DB['vehicle_expenses'])
-    veh_itc = sum(v['itc'] for v in DB['vehicle_expenses'])
-    filtered_other = filter_by_date(DB['other_expenses'], 'date', start_date, end_date)
-    other_exp = sum(e['amount'] for e in filtered_other)
-    other_itc = sum(e['itc'] for e in filtered_other)
-    total_exp = bank_exp+cash_exp+pers_exp+phone_exp+ho_exp+veh_exp+other_exp
-    total_itc = bank_itc+cash_itc+pers_itc+phone_itc+ho_itc+veh_itc+other_itc
-    c1,c2,c3,c4 = st.columns(4)
-    c1.metric("💵 Revenue",f"${total_revenue:,.0f}")
-    c2.metric("📉 Expenses",f"${total_exp:,.0f}")
-    c3.metric("💰 ITCs",f"${total_itc:,.2f}")
-    gst_coll = total_revenue*0.05/1.05
-    net = gst_coll - total_itc
-    c4.metric("GST Refund" if net<0 else "GST Owing",f"${abs(net):,.2f}")
-    st.markdown("---")
-    st.subheader("📋 Detailed Breakdown")
-    data = [
-        {'Source':'💵 Manual Revenue','Amount':f"${manual_revenue:,.2f}",'ITC':'N/A'},
-        {'Source':'🏦 Bank Revenue','Amount':f"${bank_revenue:,.2f}",'ITC':'N/A'},
-        {'Source':'🏦 Bank Expenses','Amount':f"${bank_exp:,.2f}",'ITC':f"${bank_itc:,.2f}"},
-        {'Source':'💳 Cash Expenses','Amount':f"${cash_exp:,.2f}",'ITC':f"${cash_itc:,.2f}"},
-        {'Source':'💳 Personal Account','Amount':f"${pers_exp:,.2f}",'ITC':f"${pers_itc:,.2f}"},
-        {'Source':'📱 Phone Bills','Amount':f"${phone_exp:,.2f}",'ITC':f"${phone_itc:,.2f}"},
-        {'Source':'🏠 Home Office','Amount':f"${ho_exp:,.2f}",'ITC':f"${ho_itc:,.2f}"},
-        {'Source':'🚗 Vehicle','Amount':f"${veh_exp:,.2f}",'ITC':f"${veh_itc:,.2f}"},
-        {'Source':'📚 Other','Amount':f"${other_exp:,.2f}",'ITC':f"${other_itc:,.2f}"},
-        {'Source':'**TOTAL EXPENSES**','Amount':f"**${total_exp:,.2f}**",'ITC':f"**${total_itc:,.2f}**"},
-    ]
-    st.table(pd.DataFrame(data))
-    filtered_mileage = filter_by_date(DB['mileage'], 'date', start_date, end_date)
-    if filtered_mileage:
-        total_biz_km = sum(m['business_km'] for m in filtered_mileage)
-        total_km = sum(m['total_km'] for m in filtered_mileage)
-        biz_pct_km = (total_biz_km / total_km * 100) if total_km > 0 else 0
-        st.markdown(f"### 📏 Mileage: Business KM: {total_biz_km:,} | Total KM: {total_km:,} | Business %: {biz_pct_km:.1f}%")
-    st.markdown("---")
-    st.subheader("📊 T2125 Export for Accountant")
-    def generate_t2125_csv():
-        rows = []
-        for r in filtered_rev:
-            rows.append({'Date':r['date'],'Type':'Revenue','Category':'Oilfield Services','Client_Vendor':r['client'],'Amount':r['amount'],'Business_Pct':100,'GST':r['gst_amount'],'Receipt_KM':r.get('notes',''),'Notes':r['job']})
-        if not df.empty:
-            for _, row in df[df['Status']=='business'].iterrows():
-                rows.append({'Date':row['Date'],'Type':'Expense','Category':row['Category'],'Client_Vendor':row['Description'][:50],'Amount':row['Debit'],'Business_Pct':100,'GST':row['ITC'],'Receipt_KM':'','Notes':'Bank transaction'})
-        for e in filtered_cash:
-            rows.append({'Date':e['date'],'Type':'Expense','Category':e['category'],'Client_Vendor':e['desc'],'Amount':e['amount'],'Business_Pct':100,'GST':e['itc'],'Receipt_KM':e.get('receipt',''),'Notes':f"Cash - {e['paid_by']}"})
-        for e in filtered_pers:
-            rows.append({'Date':e['date'],'Type':'Expense','Category':e['category'],'Client_Vendor':e['desc'],'Amount':e['amount'],'Business_Pct':100,'GST':e['itc'],'Receipt_KM':e.get('receipt',''),'Notes':f"Personal - {e['paid_from']}"})
-        for p in DB['phone_bills']:
-            rows.append({'Date':p['period'],'Type':'Expense','Category':'Phone & Communications','Client_Vendor':p['owner'],'Amount':p['amount'],'Business_Pct':p['biz_pct'],'GST':p['amount']*p['biz_pct']/100*0.05/1.05,'Receipt_KM':'','Notes':p.get('notes','')})
-        if ho_exp > 0:
-            rows.append({'Date':f"{start_date.year} Annual",'Type':'Expense','Category':'Home Office','Client_Vendor':'Various','Amount':ho_tot,'Business_Pct':ho['pct'],'GST':ho_itc,'Receipt_KM':'','Notes':f"Rent:{ho['rent']}, Utils:{ho['electricity']+ho['gas']+ho['water']+ho['internet']}"})
-        for v in DB['vehicle_expenses']:
-            rows.append({'Date':v['period'],'Type':'Expense','Category':f"Vehicle - {v['type']}",'Client_Vendor':v['vehicle'],'Amount':v['amount'],'Business_Pct':v['biz_pct'],'GST':v['itc'],'Receipt_KM':'','Notes':v['desc']})
-        for e in filtered_other:
-            rows.append({'Date':e['date'],'Type':'Expense','Category':e['category'],'Client_Vendor':e['desc'],'Amount':e['amount'],'Business_Pct':100,'GST':e['itc'],'Receipt_KM':'','Notes':''})
-        return pd.DataFrame(rows)
-    t2125_df = generate_t2125_csv()
-    if not t2125_df.empty:
-        st.download_button("📊 Download T2125 CSV for Accountant",t2125_df.to_csv(index=False),f"T2125_RigBooks_{start_date.year}.csv","text/csv",type="primary",use_container_width=True)
-        with st.expander("Preview T2125 Export"):
-            st.dataframe(t2125_df, use_container_width=True, hide_index=True)
-    else: st.warning("No data to export yet.")
-
-elif page == "🛡️ CRA Guide":
-    st.header("🛡️ CRA Audit Guide")
-    st.table(pd.DataFrame({"Amount":["Under $30","$30-$150","Over $150","Fuel","Meals"],"Receipt?":["❌ No","⚠️ Recommended","✅ Required","❌ No","✅ Required"],"Accepted":["Bank statement","Statement+note","Original receipt","Mileage log","Receipt+attendees"]}))
-    st.subheader("Home Office")
-    st.info("Office sq ft ÷ Total sq ft. Apply % to rent/mortgage interest, utilities, insurance, property tax.")
-    st.subheader("Phone Bills")
-    st.info("Keep bills + usage log. Business usage ÷ Total = %. Typical: 50-80%")
-    st.subheader("Vehicle & Mileage")
-    st.info("CRA Rates 2025: $0.72/km first 5,000km, $0.66/km after")
-    st.markdown("📏 **[Detailed Mileage Log 2025](https://www.dropbox.com/scl/fo/7gpryeh93mgky0ybwn66c/AFgO-qdS7aSDhqNlXqX6bks?rlkey=529qzmdiamtdoxhpacfcxsn4v&st=mzzlyssr&dl=0)**")
-    st.success("✅ With detailed records, you're audit-ready!")
-
-# Auto-save at end of every run as safety net
-persist()
+# ════════════════════════════════════════════════════════════════════════════
+#  PAGE: EXPORT FOR ACCOUNTANT
+# ════════════════════════════════════════════════════════════════════════════
 
 elif page == "📧 Export for Accountant":
     st.title("📧 Export for Accountant")
-    st.markdown("Generate **PDF** and **Excel** files with all your data — ready to email to your accountant.")
+    st.markdown("Generate **PDF** and **Excel** files ready to email — your accountant opens them like any normal file.")
 
     if st.session_state.classified_df is None:
-        st.warning("⚠️ Upload and process bank statements first.")
+        st.warning("⚠️ Upload and process a bank statement first.")
         st.stop()
 
-    st.markdown("### What's included:")
-    st.markdown("""
-    - Revenue breakdown (Wire Transfers, Mobile Deposits, Branch Deposits, E-Transfers)
-    - Business expenses by CRA category with ITC calculations
-    - Cash expenses with receipt tracking
-    - Phone bill deductions (Greg + Lilibeth)
-    - GST/HST filing summary (Lines 101, 105, 108, 109)
-    - Shareholder income split (51/49)
-    - Full transaction list
-    """)
+    try:
+        from helpers.export_accountant import generate_pdf, generate_excel
+        export_available = True
+    except ImportError:
+        export_available = False
+        st.error("Export module not found. Make sure helpers/export_accountant.py exists.")
 
-    st.markdown("---")
-    col1, col2 = st.columns(2)
+    if export_available:
+        st.markdown("""**What's included in both files:**
+- Revenue breakdown (Wire Transfers, Mobile Deposits, Branch, E-Transfers)
+- Expenses by CRA category with ITC calculations
+- Cash expenses with receipt tracking
+- Phone bill deductions (Greg + Lilibeth monthly)
+- GST/HST filing summary (Lines 101, 105, 108, 109)
+- Shareholder income split (51/49)
+- Complete transaction list
+        """)
 
-    with col1:
-        if st.button("📄 Generate PDF", type="primary", use_container_width=True):
-            with st.spinner("Building PDF..."):
-                pdf_bytes = generate_pdf(
-                    st.session_state.classified_df,
-                    st.session_state.get('cash_expenses', []),
-                    st.session_state.get('phone_bill', {}),
-                    st.session_state.fiscal_year
-                )
-                st.session_state['_pdf_bytes'] = pdf_bytes
-                st.success("PDF ready!")
+        st.markdown("---")
+        c1, c2 = st.columns(2)
 
-        if '_pdf_bytes' in st.session_state:
-            st.download_button(
-                "⬇️ Download PDF",
-                st.session_state['_pdf_bytes'],
-                f"CapeBretonerOilfield_FY{st.session_state.fiscal_year}.pdf",
-                "application/pdf",
-                use_container_width=True
-            )
+        with c1:
+            if st.button("📄 Generate PDF", type="primary", use_container_width=True):
+                with st.spinner("Building PDF..."):
+                    pdf_bytes = generate_pdf(
+                        st.session_state.classified_df,
+                        st.session_state.cash_expenses,
+                        st.session_state.phone_bill,
+                        st.session_state.fiscal_year
+                    )
+                    st.session_state['_pdf_bytes'] = pdf_bytes
+                st.success("✅ PDF ready!")
 
-    with col2:
-        if st.button("📊 Generate Excel", type="primary", use_container_width=True):
-            with st.spinner("Building Excel..."):
-                xlsx_bytes = generate_excel(
-                    st.session_state.classified_df,
-                    st.session_state.get('cash_expenses', []),
-                    st.session_state.get('phone_bill', {}),
-                    st.session_state.fiscal_year
-                )
-                st.session_state['_xlsx_bytes'] = xlsx_bytes
-                st.success("Excel ready!")
+            if '_pdf_bytes' in st.session_state:
+                st.download_button("⬇️ Download PDF", st.session_state['_pdf_bytes'],
+                    f"CapeBretonerOilfield_FY{st.session_state.fiscal_year}.pdf",
+                    "application/pdf", use_container_width=True)
 
-        if '_xlsx_bytes' in st.session_state:
-            st.download_button(
-                "⬇️ Download Excel",
-                st.session_state['_xlsx_bytes'],
-                f"CapeBretonerOilfield_FY{st.session_state.fiscal_year}.xlsx",
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                use_container_width=True
-            )
+        with c2:
+            if st.button("📊 Generate Excel", type="primary", use_container_width=True):
+                with st.spinner("Building Excel..."):
+                    xlsx_bytes = generate_excel(
+                        st.session_state.classified_df,
+                        st.session_state.cash_expenses,
+                        st.session_state.phone_bill,
+                        st.session_state.fiscal_year
+                    )
+                    st.session_state['_xlsx_bytes'] = xlsx_bytes
+                st.success("✅ Excel ready!")
 
-    st.markdown("---")
-    st.info("💡 **Tip:** Download both files and email them to your accountant. "
-            "The PDF is print-ready. The Excel has 6 tabs she can filter and sort.")
+            if '_xlsx_bytes' in st.session_state:
+                st.download_button("⬇️ Download Excel", st.session_state['_xlsx_bytes'],
+                    f"CapeBretonerOilfield_FY{st.session_state.fiscal_year}.xlsx",
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    use_container_width=True)
 
+        st.markdown("---")
+        st.info("💡 Download both and email them. PDF is print-ready. Excel has 6 tabs she can filter/sort.")
