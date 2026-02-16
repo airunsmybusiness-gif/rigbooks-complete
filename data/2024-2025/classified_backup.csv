@@ -1,0 +1,529 @@
+date,description,debit,credit,cra_category,is_personal,needs_review,itc_amount,notes,itc_pct
+2025-11-28,Branch Transaction ACCOUNT FEE,40.0,0.0,Bank Charges & Interest,False,False,1.9047619047619047,,1.0
+2025-11-28,Point of Sale - Interac PURCHASE533211295946 PETRO-CANADA 37 4506*********765,80.06,0.0,Fuel & Petroleum,False,False,3.8123809523809524,,1.0
+2025-11-26,Point of Sale - Interac PURCHASE000096032761 REDWATER REGIST 4506*********223,21.0,0.0,Vehicle Repairs & Maintenance,False,False,1.0,,1.0
+2025-11-25,Point of Sale - Interac PURCHASE532915167413 PETRO-CANADA 37 4506*********765,147.48,0.0,Fuel & Petroleum,False,False,7.022857142857142,,1.0
+2025-11-20,Point of Sale - Interac PURCHASE532413314007 PETRO-CANADA 37 4506*********765,144.87,0.0,Fuel & Petroleum,False,False,6.8985714285714295,,1.0
+2025-11-20,Point of Sale - Interac PURCHASE532400511141 REDWATER NAPA A 4506*********765,61.29,0.0,Vehicle Repairs & Maintenance,False,False,2.9185714285714286,,1.0
+2025-11-18,Electronic Funds Transfer GOVERNMENT CANADA,1000.0,0.0,Income Tax Installment,False,False,47.61904761904762,,1.0
+2025-11-18,Electronic Funds Transfer GOVERNMENT CANADA,2250.05,0.0,GST Remittance,False,False,0.0,,0.0
+2025-11-17,Electronic Funds Transfer BILL PAYMENT Koodo Mobile,114.29,0.0,Bank Charges & Interest,False,False,5.442380952380953,,1.0
+2025-11-17,Electronic Funds Transfer LOAN PAYMENT 000025198990969 SCOTIA BANK - SPL LOAN PAYMENT,535.73,0.0,Vehicle Lease/Loan Payment,True,False,25.510952380952382,,1.0
+2025-11-17,Point of Sale - Interac PURCHASE532111372309 PETRO-CANADA 37 4506*********765,150.56,0.0,Fuel & Petroleum,False,False,7.16952380952381,,1.0
+2025-11-14,Electronic Funds Transfer LOAN PAYMENT BR : 3333 TD ON-LINE LOANS SYSTEM,1458.29,0.0,Vehicle Lease/Loan Payment,False,False,69.44238095238096,,1.0
+2025-11-14,Point of Sale - Interac PURCHASE531814359720 DOLLARAMA #1289 4506*********223,75.61,0.0,Office Supplies,True,True,3.6004761904761904,,1.0
+2025-11-14,Point of Sale - Interac PURCHASE531812145653 PETRO-CANADA 37 4506*********223,40.0,0.0,Fuel & Petroleum,False,False,1.9047619047619047,,1.0
+2025-11-14,Point of Sale - Interac PURCHASE531811397299 PETRO-CANADA 37 4506*********765,137.87,0.0,Fuel & Petroleum,False,False,6.5652380952380955,,1.0
+2025-11-14,Point of Sale - Interac PURCHASE531811131422 PETRO-CANADA 37 4506*********765,34.16,0.0,Fuel & Petroleum,False,False,1.6266666666666665,,1.0
+2025-11-10,Internet Banking E-TRANSFER105692311578 rent@realtyfocus.com 4506*********765,1600.0,0.0,Office Rent - Commercial,False,False,76.19047619047619,,1.0
+2025-11-10,Internet Banking E-TRANSFER105692311074 rent@realtyfocus.com 4506*********765,156.38,0.0,Office Rent - Commercial,False,False,7.446666666666666,,1.0
+2025-11-10,Internet Banking INTERNET TRANSFER000000223323 TO: 00099/78-83439 4506*********765,5000.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-11-07,Point of Sale - Interac PURCHASE583001001055 GREEN SOLUTION 4506*********765,20.99,0.0,Personal - Not Deductible,True,False,0.9995238095238094,,1.0
+2025-11-07,Point of Sale - Interac PURCHASE531200598334 UPTOWN PIZZA & 4506*********765,55.24,0.0,Meals & Entertainment (50%),False,False,2.6304761904761906,,1.0
+2025-11-07,Point of Sale - Interac PURCHASE102001001058 FGP50206 FAS GA 4506*********765,7.55,0.0,Fuel & Petroleum,False,False,0.3595238095238095,,1.0
+2025-11-07,Point of Sale - Interac PURCHASE531108965589 TIM HORTONS #76 4506*********765,2.52,0.0,Meals & Entertainment (50%),False,False,0.12,,1.0
+2025-11-06,Point of Sale - Interac PURCHASE531000712093 LIQUOR STATION 4506*********765,20.24,0.0,Personal - Not Deductible,True,False,0.9638095238095238,,1.0
+2025-11-06,Point of Sale - Interac PURCHASE582001001013 GREEN SOLUTION 4506*********765,35.69,0.0,Personal - Not Deductible,True,False,1.6995238095238094,,1.0
+2025-11-06,Point of Sale - Interac PURCHASE531014414915 PETRO-CANADA 37 4506*********765,149.43,0.0,Fuel & Petroleum,False,False,7.115714285714286,,1.0
+2025-11-06,Branch Transaction WIRE TSF 0692086 PRICEWATERHOUSECOOPERS INC LONG RUN EXPL CONTRACTOR INV 3,0.0,14727.0,Revenue,False,False,0.0,,0.0
+2025-11-06,Point of Sale - Interac PURCHASE099001001092 FGP50206 FAS GA 4506*********765,7.55,0.0,Fuel & Petroleum,False,False,0.3595238095238095,,1.0
+2025-11-06,Point of Sale - Interac PURCHASE531008826887 TIM HORTONS #76 4506*********765,2.52,0.0,Meals & Entertainment (50%),False,False,0.12,,1.0
+2025-11-05,Electronic Funds Transfer INSURANCE MANULIFE FINANCIAL,31.89,0.0,Other / Unclassified,False,False,1.5185714285714285,,1.0
+2025-11-05,Point of Sale - Interac PURCHASE993110341105 LITTLE STEPS DE 4506*********223,330.0,0.0,Other / Unclassified,True,False,15.714285714285714,,1.0
+2025-11-05,Point of Sale - Interac PURCHASE097001001099 FGP50206 FAS GA 4506*********765,7.55,0.0,Fuel & Petroleum,False,False,0.3595238095238095,,1.0
+2025-11-05,Point of Sale - Interac PURCHASE530818620537 RAINBOW RESTAUR 4506*********223,72.32,0.0,Meals & Entertainment (50%),False,False,3.443809523809523,,1.0
+2025-11-04,Point of Sale - Interac PURCHASE530813403540 PETRO-CANADA 37 4506*********765,19.84,0.0,Fuel & Petroleum,False,False,0.9447619047619047,,1.0
+2025-11-03,Electronic Funds Transfer BILL PAYMENT Koodo Mobile,70.6,0.0,Telephone & Internet,False,False,3.3619047619047615,,1.0
+2025-11-03,Point of Sale - Interac PURCHASE579001001004 GREEN SOLUTION 4506*********765,19.94,0.0,Personal - Not Deductible,True,False,0.9495238095238095,,1.0
+2025-11-03,Point of Sale - Interac PURCHASE091001001054 FGP50206 FAS GA 4506*********765,20.0,0.0,Fuel & Petroleum,False,False,0.9523809523809523,,1.0
+2025-11-03,Point of Sale - Interac PURCHASE091001001036 FGP50206 FAS GA 4506*********765,44.07,0.0,Fuel & Petroleum,False,False,2.0985714285714283,,1.0
+2025-11-03,Point of Sale - Interac PURCHASE530520133341 NC CO-OP @ BRIN 4506*********765,20.0,0.0,Fuel & Petroleum,False,False,0.9523809523809523,,1.0
+2025-10-31,Branch Transaction ACCOUNT FEE,40.0,0.0,Bank Charges & Interest,False,False,1.9047619047619047,,1.0
+2025-10-31,Point of Sale - Interac PURCHASE511021541031 OK TIRE REDWATE 4506*********765,201.6,0.0,Vehicle Repairs & Maintenance,False,False,9.6,,1.0
+2025-10-31,Point of Sale - Interac PURCHASE530417292104 PETRO-CANADA 37 4506*********765,100.09,0.0,Fuel & Petroleum,False,False,4.766190476190476,,1.0
+2025-10-30,Point of Sale - Interac PURCHASE661666271030 OK TIRE REDWATE 4506*********765,150.26,0.0,Vehicle Repairs & Maintenance,False,False,7.1552380952380945,,1.0
+2025-10-29,Point of Sale - Interac PURCHASE530211110359 PETRO-CANADA 37 4506*********765,100.24,0.0,Fuel & Petroleum,False,False,4.773333333333333,,1.0
+2025-10-27,Point of Sale - Interac PURCHASE001001001057 PRINCESS AUTO 3 4506*********765,28.33,0.0,Equipment & Supplies,False,False,1.349047619047619,,1.0
+2025-10-27,Point of Sale - Interac PURCHASE529914265250 PETRO-CANADA 37 4506*********765,39.95,0.0,Fuel & Petroleum,False,False,1.9023809523809525,,1.0
+2025-10-27,Point of Sale - Interac PURCHASE997341091025 BIANCA AMORS LI 4506*********765,137.55,0.0,Office Supplies,True,True,6.550000000000001,,1.0
+2025-10-23,Point of Sale - Interac PURCHASE529611236192 PETRO-CANADA 37 4506*********765,100.0,0.0,Fuel & Petroleum,False,False,4.761904761904762,,1.0
+2025-10-20,Point of Sale - Interac PURCHASE529221357323 PETRO-CANADA 30 4506*********765,44.88,0.0,Fuel & Petroleum,False,False,2.1371428571428575,,1.0
+2025-10-20,Point of Sale - Interac PURCHASE529214456328 SHELL C44232 4506*********765,29.99,0.0,Fuel & Petroleum,False,False,1.428095238095238,,1.0
+2025-10-20,Internet Banking E-TRANSFER105663061821 Lilibeth Sejera 4506*********765,2000.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-10-17,Electronic Funds Transfer GOVERNMENT CANADA,1000.0,0.0,Income Tax Installment,False,False,47.61904761904762,,1.0
+2025-10-17,Electronic Funds Transfer GOVERNMENT CANADA,5000.0,0.0,GST Remittance,False,False,0.0,,0.0
+2025-10-17,Electronic Funds Transfer LOAN PAYMENT 000025198990969 SCOTIA BANK - SPL LOAN PAYMENT,535.73,0.0,Vehicle Lease/Loan Payment,True,False,25.510952380952382,,1.0
+2025-10-16,Point of Sale - Interac PURCHASE528912030409 RAINBOW RESTAUR 4506*********223,38.86,0.0,Meals & Entertainment (50%),False,False,1.8504761904761904,,1.0
+2025-10-16,Point of Sale - Interac PURCHASE528914267044 PETRO-CANADA 37 4506*********223,40.0,0.0,Fuel & Petroleum,False,False,1.9047619047619047,,1.0
+2025-10-15,Electronic Funds Transfer BILL PAYMENT Koodo Mobile,87.41,0.0,Telephone & Internet,False,False,4.162380952380952,,1.0
+2025-10-14,Electronic Funds Transfer LOAN PAYMENT BR : 3333 TD ON-LINE LOANS SYSTEM,1458.29,0.0,Vehicle Lease/Loan Payment,False,False,69.44238095238096,,1.0
+2025-10-14,Point of Sale - Interac PURCHASE528700510282 REDWATER NAPA A 4506*********765,267.73,0.0,Equipment & Supplies,False,False,12.74904761904762,,1.0
+2025-10-14,Point of Sale - Interac PURCHASE528700510010 REDWATER NAPA A 4506*********765,47.86,0.0,Equipment & Supplies,False,False,2.279047619047619,,1.0
+2025-10-14,Point of Sale - Interac PURCHASE528621133190 ACHTI'S STEAK & 4506*********223,104.75,0.0,Meals & Entertainment (50%),False,False,4.988095238095238,,1.0
+2025-10-14,Point of Sale - Interac PURCHASE099001001043 EDMONTON STORE 4506*********223,408.91,0.0,Home Office Expenses,True,True,19.471904761904764,,1.0
+2025-10-14,Point of Sale - Interac PURCHASE528514148743 PART SOURCE #80 4506*********223,265.62,0.0,Vehicle Repairs & Maintenance,False,False,12.64857142857143,,1.0
+2025-10-08,Point of Sale - Interac PURCHASE528113969051 RAINBOW RESTAUR 4506*********765,79.5,0.0,Meals & Entertainment (50%),False,False,3.7857142857142856,,1.0
+2025-10-08,Internet Banking INTERNET TRANSFER000000105047 TO: 00099/78-83439 4506*********765,5000.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-10-07,Point of Sale - Interac PURCHASE528012213073 PETRO-CANADA 37 4506*********765,168.75,0.0,Fuel & Petroleum,False,False,8.035714285714285,,1.0
+2025-10-07,Internet Banking E-TRANSFER105648428567 rent@realtyfocus.com 4506*********765,171.49,0.0,Office Rent - Commercial,False,False,8.166190476190476,,1.0
+2025-10-07,Internet Banking E-TRANSFER105648426377 rent@realtyfocus.com 4506*********765,1600.0,0.0,Office Rent - Commercial,False,False,76.19047619047619,,1.0
+2025-10-07,Internet Banking MOBILE DEPOSIT,0.0,2021.25,Revenue,False,False,0.0,,0.0
+2025-10-06,Electronic Funds Transfer INSURANCE MANULIFE FINANCIAL,31.89,0.0,Other / Unclassified,False,False,1.5185714285714285,,1.0
+2025-10-06,Branch Transaction WIRE TSF 0612522 PRICEWATERHOUSECOOPERS INC LONG RUN EXPL CONTRACTOR INV 3,0.0,17798.25,Revenue,False,False,0.0,,0.0
+2025-10-06,Internet Banking INTERNET TRANSFER000000107696 TO: 00099/78-83439 4506*********765,500.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-10-06,Point of Sale - Interac PURCHASE000001289298 REDWATER IGA #1 4506*********765,23.0,0.0,Meals & Entertainment (50%),True,False,1.0952380952380953,,1.0
+2025-10-06,Point of Sale - Interac PURCHASE527816302998 FORT IN VIEW GO 4506*********765,38.53,0.0,Meals & Entertainment (50%),True,True,1.8347619047619048,,1.0
+2025-10-06,Point of Sale - Interac PURCHASE527813372978 FORT IN VIEW GO 4506*********765,194.0,0.0,Meals & Entertainment (50%),True,True,9.238095238095239,,1.0
+2025-10-06,Point of Sale - Interac PURCHASE000001592002 DQ GRILL & CHIL 4506*********765,13.74,0.0,Meals & Entertainment (50%),False,False,0.6542857142857144,,1.0
+2025-10-06,Point of Sale - Interac PURCHASE527713226483 CANNA CABANA MO 4506*********765,20.84,0.0,Personal - Not Deductible,True,False,0.9923809523809524,,1.0
+2025-10-06,Point of Sale - Interac PURCHASE527708427004 TIM HORTONS #76 4506*********765,10.45,0.0,Meals & Entertainment (50%),False,False,0.49761904761904757,,1.0
+2025-10-03,Point of Sale - Interac PURCHASE527610221873 SHELL C21834 4506*********765,11.11,0.0,Fuel & Petroleum,False,False,0.529047619047619,,1.0
+2025-10-02,Electronic Funds Transfer BILL PAYMENT Koodo Mobile,70.6,0.0,Bank Charges & Interest,False,False,3.3619047619047615,,1.0
+2025-10-02,Point of Sale - Interac PURCHASE527516117357 22648 CIRCLE K 4506*********765,23.07,0.0,Fuel & Petroleum,False,False,1.0985714285714285,,1.0
+2025-10-02,Point of Sale - Interac PURCHASE031001001064 FGP50206 FAS GA 4506*********765,10.05,0.0,Fuel & Petroleum,False,False,0.4785714285714286,,1.0
+2025-10-01,Point of Sale - Interac PURCHASE527400668284 LIQUOR STATION 4506*********765,19.64,0.0,Personal - Not Deductible,True,False,0.9352380952380953,,1.0
+2025-10-01,Point of Sale - Interac PURCHASE527312157799 PETRO-CANADA 37 4506*********765,100.0,0.0,Fuel & Petroleum,False,False,4.761904761904762,,1.0
+2025-10-01,Point of Sale - Interac PURCHASE527308860115 TIM HORTONS #76 4506*********765,16.56,0.0,Meals & Entertainment (50%),False,False,0.7885714285714285,,1.0
+2025-09-29,Branch Transaction ACCOUNT FEE,40.0,0.0,Bank Charges & Interest,False,False,1.9047619047619047,,1.0
+2025-09-29,Point of Sale - Interac PURCHASE527200666108 LIQUOR STATION 4506*********765,9.64,0.0,Fuel & Petroleum,True,False,0.4590476190476191,,1.0
+2025-09-29,Point of Sale - Interac PURCHASE527208698929 TIM HORTONS #76 4506*********765,4.54,0.0,Meals & Entertainment (50%),False,False,0.21619047619047618,,1.0
+2025-09-29,Point of Sale - Interac PURCHASE543001001030 GREEN SOLUTION 4506*********765,12.59,0.0,Personal - Not Deductible,True,False,0.5995238095238096,,1.0
+2025-09-29,Point of Sale - Interac PURCHASE527108574472 TIM HORTONS #76 4506*********765,7.75,0.0,Meals & Entertainment (50%),False,False,0.36904761904761907,,1.0
+2025-09-29,Point of Sale - Interac PURCHASE527110427291 PETRO-CANADA 77 4506*********765,9.19,0.0,Fuel & Petroleum,False,False,0.43761904761904763,,1.0
+2025-09-29,Internet Banking E-TRANSFER011374935736 LILIBETH SEJERA 4506*********765,0.0,491.27,Shareholder Distribution,False,False,0.0,,0.0
+2025-09-29,Internet Banking E-TRANSFER105634672681 Lilibeth Sejera 4506*********765,491.47,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-09-29,Point of Sale - Interac PURCHASE527010216235 PETRO-CANADA 37 4506*********765,70.12,0.0,Fuel & Petroleum,False,False,3.3390476190476193,,1.0
+2025-09-26,Point of Sale - Interac PURCHASE000001192050 DAIRY QUEEN #71 4506*********223,27.27,0.0,Meals & Entertainment (50%),False,False,1.2985714285714287,,1.0
+2025-09-23,Internet Banking MOBILE DEPOSIT,0.0,1267.88,Revenue,False,False,0.0,,0.0
+2025-09-22,Point of Sale - Interac PURCHASE526515355508 TOFIELD TEMPO 4506*********765,37.8,0.0,Fuel & Petroleum,False,False,1.7999999999999998,,1.0
+2025-09-22,Internet Banking INTERNET TRANSFER000000236435 TO: 00099/78-83439 4506*********765,600.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-09-22,Point of Sale - Interac PURCHASE526308508377 TIM HORTONS #76 4506*********765,4.35,0.0,Meals & Entertainment (50%),False,False,0.20714285714285713,,1.0
+2025-09-19,Point of Sale - Interac PURCHASE526210358003 LAMONT FOODS 4506*********765,21.43,0.0,Meals & Entertainment (50%),False,False,1.0204761904761905,,1.0
+2025-09-19,Point of Sale - Interac PURCHASE526208333817 TIM HORTONS #76 4506*********765,14.93,0.0,Meals & Entertainment (50%),False,False,0.710952380952381,,1.0
+2025-09-19,Point of Sale - Interac PURCHASE526100652661 LIQUOR STATION 4506*********765,10.12,0.0,Fuel & Petroleum,True,False,0.4819047619047619,,1.0
+2025-09-17,Electronic Funds Transfer LOAN PAYMENT 000025198990969 SCOTIA BANK - SPL LOAN PAYMENT,535.73,0.0,Vehicle Lease/Loan Payment,True,False,25.510952380952382,,1.0
+2025-09-16,Point of Sale - Interac PURCHASE525910179019 PETRO-CANADA 37 4506*********765,100.33,0.0,Fuel & Petroleum,False,False,4.777619047619048,,1.0
+2025-09-15,Electronic Funds Transfer LOAN PAYMENT BR : 3333 TD ON-LINE LOANS SYSTEM,1458.29,0.0,Vehicle Lease/Loan Payment,False,False,69.44238095238096,,1.0
+2025-09-15,Electronic Funds Transfer BILL PAYMENT Koodo Mobile,87.1,0.0,Bank Charges & Interest,False,False,4.147619047619047,,1.0
+2025-09-15,Point of Sale - Interac PURCHASE525718774153 RAINBOW RESTAUR 4506*********223,69.3,0.0,Meals & Entertainment (50%),False,False,3.3,,1.0
+2025-09-15,Internet Banking E-TRANSFER105616721981 rent@realtyfocus.com 4506*********765,141.39,0.0,Office Rent - Commercial,False,False,6.732857142857142,,1.0
+2025-09-15,Point of Sale - Interac PURCHASE995001001032 FGP50206 FAS GA 4506*********765,25.19,0.0,Fuel & Petroleum,False,False,1.1995238095238094,,1.0
+2025-09-12,Electronic Funds Transfer GOVERNMENT CANADA,1000.0,0.0,Income Tax Installment,False,False,47.61904761904762,,1.0
+2025-09-12,Electronic Funds Transfer GOVERNMENT CANADA,4000.0,0.0,Income Tax Installment,False,False,190.47619047619048,,1.0
+2025-09-10,Point of Sale - Interac PURCHASE525309323357 PETRO-CANADA 37 4506*********765,139.91,0.0,Fuel & Petroleum,False,False,6.662380952380952,,1.0
+2025-09-09,Point of Sale - Interac PURCHASE525200506678 REDWATER NAPA A 4506*********765,80.41,0.0,Vehicle Repairs & Maintenance,False,False,3.829047619047619,,1.0
+2025-09-08,Internet Banking INTERNET TRANSFER000000234881 TO: 00099/78-83439 4506*********765,5000.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-09-08,Point of Sale - Interac PURCHASE524916188486 CENTEX WEST ED 4506*********765,55.86,0.0,Fuel & Petroleum,False,False,2.66,,1.0
+2025-09-08,Internet Banking E-TRANSFER105606994178 One-time contact 4506*********765,360.0,0.0,Bank Charges & Interest,False,False,17.142857142857142,,1.0
+2025-09-05,Electronic Funds Transfer INSURANCE MANULIFE FINANCIAL,31.89,0.0,Other / Unclassified,False,False,1.5185714285714285,,1.0
+2025-09-05,Point of Sale - Interac PURCHASE524815544375 GCOC #000025 4506*********765,154.33,0.0,Fuel & Petroleum,False,False,7.34904761904762,,1.0
+2025-09-05,Point of Sale - Interac PURCHASE524814372757 PART SOURCE #79 4506*********765,621.03,0.0,Vehicle Repairs & Maintenance,False,True,29.572857142857142,,1.0
+2025-09-05,Internet Banking E-TRANSFER105606095494 rent@realtyfocus.com 4506*********765,1600.0,0.0,Office Rent - Commercial,False,False,76.19047619047619,,1.0
+2025-09-05,Internet Banking E-TRANSFER105605935862 Mathieu Hryniuk LLP 4506*********765,377.0,0.0,Bank Charges & Interest,False,False,17.952380952380953,,1.0
+2025-09-04,Branch Transaction WIRE TSF 0479468 PRICEWATERHOUSECOOPERS INC LRE INV 2025 08 INV 3,0.0,14590.5,Revenue,False,False,0.0,,0.0
+2025-09-03,Point of Sale - Interac PURCHASE000096031462 REDWATER REGIST 4506*********765,266.0,0.0,Vehicle Repairs & Maintenance,False,False,12.666666666666666,,1.0
+2025-09-02,Electronic Funds Transfer BILL PAYMENT Koodo Mobile,70.6,0.0,Bank Charges & Interest,False,False,3.3619047619047615,,1.0
+2025-09-02,Electronic Funds Transfer DEBIT MEMO GPFS-SERVICE CHARGE,2.0,0.0,Bank Charges & Interest,False,False,0.09523809523809523,,1.0
+2025-09-02,Point of Sale - Interac PURCHASE524316164096 REDWATER HOME H 4506*********223,26.75,0.0,Equipment & Supplies,False,False,1.273809523809524,,1.0
+2025-09-02,Point of Sale - Interac PURCHASE524311339621 PETRO-CANADA 37 4506*********765,100.01,0.0,Fuel & Petroleum,False,False,4.762380952380953,,1.0
+2025-09-02,Point of Sale - Interac PURCHASE971001001037 FGP50206 FAS GA 4506*********765,21.33,0.0,Fuel & Petroleum,False,False,1.0157142857142856,,1.0
+2025-08-29,Branch Transaction ACCOUNT FEE,40.0,0.0,Bank Charges & Interest,False,False,1.9047619047619047,,1.0
+2025-08-28,Point of Sale - Interac PURCHASE524017400616 PETRO-CANADA 37 4506*********765,50.0,0.0,Fuel & Petroleum,False,False,2.380952380952381,,1.0
+2025-08-26,Electronic Funds Transfer GOVERNMENT CANADA,103.69,0.0,Income Tax Installment,False,False,4.937619047619047,,1.0
+2025-08-26,Point of Sale - Interac PURCHASE523800525677 REDWATER NAPA A 4506*********765,323.4,0.0,Vehicle Repairs & Maintenance,False,False,15.399999999999997,,1.0
+2025-08-26,Point of Sale - Interac PURCHASE523800525541 REDWATER NAPA A 4506*********765,217.85,0.0,Vehicle Repairs & Maintenance,False,False,10.373809523809523,,1.0
+2025-08-25,Internet Banking MOBILE DEPOSIT,0.0,1396.5,Revenue,False,False,0.0,,0.0
+2025-08-22,Internet Banking E-TRANSFER105586728360 Angela Henderson 4506*********765,880.0,0.0,Bank Charges & Interest,False,False,41.904761904761905,,1.0
+2025-08-18,Electronic Funds Transfer LOAN PAYMENT 000025198990969 SCOTIA BANK - SPL LOAN PAYMENT,535.73,0.0,Vehicle Lease/Loan Payment,True,False,25.510952380952382,,1.0
+2025-08-18,Point of Sale - Interac PURCHASE522818477894 PETRO-CANADA 37 4506*********765,147.12,0.0,Fuel & Petroleum,False,False,7.005714285714286,,1.0
+2025-08-15,Electronic Funds Transfer BILL PAYMENT Koodo Mobile,87.1,0.0,Bank Charges & Interest,False,False,4.147619047619047,,1.0
+2025-08-15,Electronic Funds Transfer DEBIT MEMO ABCIT-4454247 GPFS-GOVERNMENT PAYMENT,2347.87,0.0,Bank Charges & Interest,False,False,111.80333333333333,,1.0
+2025-08-15,Point of Sale - Interac PURCHASE522715177471 PETRO-CANADA 37 4506*********765,28.23,0.0,Fuel & Petroleum,False,False,1.3442857142857145,,1.0
+2025-08-14,Electronic Funds Transfer LOAN PAYMENT BR : 3333 TD ON-LINE LOANS SYSTEM,1458.29,0.0,Vehicle Lease/Loan Payment,False,False,69.44238095238096,,1.0
+2025-08-14,Internet Banking INTERNET BILL PMT000000109411 INTACT INSURANCE COMPANY 4506*********765,916.0,0.0,Business Insurance,False,False,43.61904761904762,,1.0
+2025-08-13,Point of Sale - Interac PURCHASE522515235411 PETRO-CANADA 37 4506*********765,28.21,0.0,Fuel & Petroleum,False,False,1.3433333333333333,,1.0
+2025-08-12,Electronic Funds Transfer GOVERNMENT CANADA,308.48,0.0,Income Tax Installment,False,False,14.689523809523811,,1.0
+2025-08-12,Internet Banking E-TRANSFER105573683921 rent@realtyfocus.com 4506*********765,1600.0,0.0,Office Rent - Commercial,False,False,76.19047619047619,,1.0
+2025-08-12,Internet Banking E-TRANSFER105573681342 rent@realtyfocus.com 4506*********765,153.83,0.0,Office Rent - Commercial,False,False,7.325238095238096,,1.0
+2025-08-12,Point of Sale - Interac PURCHASE522411311347 PETRO-CANADA 37 4506*********765,35.04,0.0,Fuel & Petroleum,False,False,1.6685714285714286,,1.0
+2025-08-12,Point of Sale - Interac PURCHASE522321223223 MOBIL@ - 1772 4506*********765,46.83,0.0,Fuel & Petroleum,False,False,2.23,,1.0
+2025-08-12,Point of Sale - Interac PURCHASE137721677972 SQ *THE BREAD H 4506*********223,21.89,0.0,Meals & Entertainment (50%),True,False,1.0423809523809524,,1.0
+2025-08-11,Point of Sale - Interac PURCHASE992934040811 LITTLE STEPS DE 4506*********223,724.0,0.0,Other / Unclassified,True,False,34.476190476190474,,1.0
+2025-08-11,Point of Sale - Interac PURCHASE522221202500 NC CO-OP @ BRIN 4506*********765,20.0,0.0,Fuel & Petroleum,False,False,0.9523809523809523,,1.0
+2025-08-11,Point of Sale - Interac PURCHASE522214122532 PETRO-CANADA 02 4506*********765,27.72,0.0,Fuel & Petroleum,False,False,1.32,,1.0
+2025-08-08,Point of Sale - Interac PURCHASE522018454650 PETRO-CANADA 85 4506*********765,43.7,0.0,Fuel & Petroleum,False,False,2.080952380952381,,1.0
+2025-08-08,Internet Banking INTERNET TRANSFER000000127831 TO: 00099/78-83439 4506*********765,5000.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-08-08,Point of Sale - Interac PURCHASE490001001078 GREEN SOLUTION 4506*********765,99.74,0.0,Personal - Not Deductible,True,False,4.74952380952381,,1.0
+2025-08-07,Automated Banking Machine ABM WITHDRAWAL 2A97 REDWATER 18242 4506*********765,200.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-08-07,Branch Transaction WIRE TSF 0702764 PRICEWATERHOUSECOOPERS INC LONG RUN EXPL CONTRACTOR INV 3,0.0,17047.5,Revenue,False,False,0.0,,0.0
+2025-08-06,Point of Sale - Interac PURCHASE925001001062 FGP50206 FAS GA 4506*********765,8.2,0.0,Fuel & Petroleum,False,False,0.3904761904761904,,1.0
+2025-08-06,Point of Sale - Interac PURCHASE521800600726 LIQUOR STATION 4506*********765,10.12,0.0,Personal - Not Deductible,True,False,0.4819047619047619,,1.0
+2025-08-05,Electronic Funds Transfer BILL PAYMENT Koodo Mobile,70.6,0.0,Bank Charges & Interest,False,False,3.3619047619047615,,1.0
+2025-08-05,Electronic Funds Transfer INSURANCE MANULIFE FINANCIAL,31.89,0.0,Other / Unclassified,False,False,1.5185714285714285,,1.0
+2025-08-05,Point of Sale - Interac PURCHASE923001001070 FGP50206 FAS GA 4506*********765,19.38,0.0,Fuel & Petroleum,False,False,0.9228571428571428,,1.0
+2025-08-04,Point of Sale - Interac PURCHASE521608950862 TIM HORTONS #76 4506*********765,6.28,0.0,Meals & Entertainment (50%),False,False,0.29904761904761906,,1.0
+2025-08-04,Point of Sale - Interac PURCHASE920001001151 FGP50206 FAS GA 4506*********765,15.3,0.0,Fuel & Petroleum,False,False,0.7285714285714286,,1.0
+2025-08-04,Point of Sale - Interac PURCHASE521515269053 PETRO-CANADA 37 4506*********765,60.0,0.0,Fuel & Petroleum,False,False,2.857142857142857,,1.0
+2025-08-04,Point of Sale - Interac PURCHASE521508838180 TIM HORTONS #76 4506*********765,3.35,0.0,Meals & Entertainment (50%),False,False,0.15952380952380954,,1.0
+2025-08-04,Point of Sale - Interac PURCHASE521416187753 PETRO-CANADA 77 4506*********765,11.91,0.0,Fuel & Petroleum,False,False,0.5671428571428572,,1.0
+2025-08-04,Point of Sale - Interac PURCHASE485001001008 GREEN SOLUTION 4506*********765,36.74,0.0,Personal - Not Deductible,True,False,1.7495238095238097,,1.0
+2025-07-31,Branch Transaction ACCOUNT FEE,40.0,0.0,Bank Charges & Interest,False,False,1.9047619047619047,,1.0
+2025-07-31,Point of Sale - Interac PURCHASE915001001117 FGP50206 FAS GA 4506*********765,34.68,0.0,Fuel & Petroleum,False,False,1.6514285714285712,,1.0
+2025-07-31,Point of Sale - Interac PURCHASE914001001192 FGP50206 FAS GA 4506*********765,45.3,0.0,Fuel & Petroleum,False,False,2.157142857142857,,1.0
+2025-07-30,Point of Sale - Interac PURCHASE521115407370 PETRO-CANADA 37 4506*********765,100.19,0.0,Fuel & Petroleum,False,False,4.770952380952381,,1.0
+2025-07-29,Point of Sale - Interac PURCHASE521011127319 PETRO-CANADA 37 4506*********765,27.9,0.0,Fuel & Petroleum,False,False,1.3285714285714285,,1.0
+2025-07-28,Point of Sale - Interac PURCHASE520914339078 CPC / SCP 57770 4506*********223,18.22,0.0,Fuel & Petroleum,False,False,0.8676190476190476,,1.0
+2025-07-28,Point of Sale - Interac PURCHASE742001001010 CHEVRON #52595 4506*********765,37.0,0.0,Fuel & Petroleum,False,False,1.7619047619047619,,1.0
+2025-07-28,Point of Sale - Interac PURCHASE520716122785 DOWNTOWN FAS GA 4506*********765,42.81,0.0,Fuel & Petroleum,False,False,2.0385714285714287,,1.0
+2025-07-25,Point of Sale - Interac PURCHASE520614401547 FOX CREEK ESSO 4506*********765,52.26,0.0,Fuel & Petroleum,False,False,2.4885714285714284,,1.0
+2025-07-18,Point of Sale - Interac PURCHASE519913205797 PETRO-CANADA 37 4506*********765,149.02,0.0,Fuel & Petroleum,False,False,7.096190476190476,,1.0
+2025-07-17,Electronic Funds Transfer LOAN PAYMENT 000025198990969 SCOTIA BANK - SPL LOAN PAYMENT,535.73,0.0,Vehicle Lease/Loan Payment,True,False,25.510952380952382,,1.0
+2025-07-17,Point of Sale - Interac PURCHASE001001001184 J&R DRIVE THRU 4506*********223,24.15,0.0,Meals & Entertainment (50%),False,False,1.15,,1.0
+2025-07-17,Internet Banking INTERNET TRANSFER000000105320 TO: 00099/78-83439 4506*********765,1000.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-07-15,Electronic Funds Transfer BILL PAYMENT Koodo Mobile,87.26,0.0,Bank Charges & Interest,False,False,4.155238095238095,,1.0
+2025-07-15,Internet Banking INTERNET TRANSFER000000126231 TO: 00099/78-83439 4506*********765,3000.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-07-14,Electronic Funds Transfer LOAN PAYMENT BR : 3333 TD ON-LINE LOANS SYSTEM,1458.29,0.0,Vehicle Lease/Loan Payment,False,False,69.44238095238096,,1.0
+2025-07-14,Electronic Funds Transfer GOVERNMENT CANADA,308.48,0.0,Income Tax Installment,False,False,14.689523809523811,,1.0
+2025-07-14,Point of Sale - Interac PURCHASE519417474883 MOBIL@ - 1767 4506*********765,47.88,0.0,Fuel & Petroleum,False,False,2.28,,1.0
+2025-07-14,Point of Sale - Interac PURCHASE519222406868 RIVER CREE BIST 4506*********765,165.08,0.0,Meals & Entertainment (50%),True,False,7.860952380952382,,1.0
+2025-07-14,Point of Sale - Interac PURCHASE519220303313 PETRO-CANADA 37 4506*********765,48.96,0.0,Fuel & Petroleum,False,False,2.331428571428572,,1.0
+2025-07-11,Point of Sale - Interac PURCHASE519119953536 RAINBOW RESTAUR 4506*********223,63.63,0.0,Meals & Entertainment (50%),False,False,3.0300000000000002,,1.0
+2025-07-10,Point of Sale - Interac PURCHASE519020451018 PETRO-CANADA 37 4506*********765,103.69,0.0,Fuel & Petroleum,False,False,4.937619047619047,,1.0
+2025-07-09,Point of Sale - Interac PURCHASE000096030520 REDWATER REGIST 4506*********223,93.0,0.0,Vehicle Repairs & Maintenance,False,False,4.428571428571429,,1.0
+2025-07-09,Internet Banking E-TRANSFER105530124815 rent@realtyfocus.com 4506*********765,1600.0,0.0,Office Rent - Commercial,False,False,76.19047619047619,,1.0
+2025-07-09,Internet Banking E-TRANSFER105530123522 rent@realtyfocus.com 4506*********765,161.66,0.0,Office Rent - Commercial,False,False,7.698095238095238,,1.0
+2025-07-08,Point of Sale - Interac PURCHASE518917357897 REDWATER COMMUN 4506*********765,65.0,0.0,Meals & Entertainment (50%),False,True,3.095238095238095,Unclassified,1.0
+2025-07-08,Point of Sale - Interac PURCHASE001001001022 J&R DRIVE THRU 4506*********765,47.15,0.0,Meals & Entertainment (50%),False,False,2.2452380952380953,,1.0
+2025-07-08,Point of Sale - Interac PURCHASE873001001078 FGP50206 FAS GA 4506*********765,19.38,0.0,Fuel & Petroleum,False,False,0.9228571428571428,,1.0
+2025-07-08,Internet Banking MOBILE DEPOSIT,0.0,918.75,Revenue,False,False,0.0,,0.0
+2025-07-08,Internet Banking INTERNET TRANSFER000000131756 TO: 00099/78-83439 4506*********765,4000.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-07-07,Electronic Funds Transfer INSURANCE MANULIFE FINANCIAL,31.89,0.0,Other / Unclassified,False,False,1.5185714285714285,,1.0
+2025-07-07,Point of Sale - Interac PURCHASE871001001184 FGP50206 FAS GA 4506*********765,22.37,0.0,Fuel & Petroleum,False,False,1.0652380952380953,,1.0
+2025-07-07,Automated Banking Machine ABM WITHDRAWAL 2A97 REDWATER 18242 4506*********765,40.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-07-07,Point of Sale - Interac PURCHASE518713101796 REDWATER ESSO 4506*********765,13.15,0.0,Fuel & Petroleum,False,False,0.6261904761904763,,1.0
+2025-07-07,Point of Sale - Interac PURCHASE870001001023 FGP50206 FAS GA 4506*********765,19.38,0.0,Fuel & Petroleum,False,False,0.9228571428571428,,1.0
+2025-07-07,Point of Sale - Interac PURCHASE137708607824 SQ *KICKS SALOO 4506*********765,74.97,0.0,Meals & Entertainment (50%),True,False,3.57,,1.0
+2025-07-04,Point of Sale - Interac PURCHASE518515190486 PETRO-CANADA 37 4506*********765,102.01,0.0,Fuel & Petroleum,False,False,4.857619047619048,,1.0
+2025-07-03,Point of Sale - Interac PURCHASE814813200703 1185508 ALBERTA 4506*********223,131.2,0.0,Home Office Expenses,False,True,6.247619047619047,Unclassified,1.0
+2025-07-03,Point of Sale - Interac PURCHASE518417294277 REDWATER COMMUN 4506*********765,85.0,0.0,Meals & Entertainment (50%),False,True,4.0476190476190474,Unclassified,1.0
+2025-07-03,Branch Transaction WIRE TSF 0310680 PRICEWATERHOUSECOOPERS INC INV 31 LONG RUN EXPL INV 2025,0.0,13225.5,Revenue,False,False,0.0,,0.0
+2025-07-02,Electronic Funds Transfer BILL PAYMENT Koodo Mobile,70.6,0.0,Bank Charges & Interest,False,False,3.3619047619047615,,1.0
+2025-07-02,Point of Sale - Interac PURCHASE518310414033 PETRO-CANADA 37 4506*********765,60.09,0.0,Fuel & Petroleum,False,False,2.8614285714285717,,1.0
+2025-07-02,Internet Banking E-TRANSFER105517927096 bb 4506*********765,24.0,0.0,Bank Charges & Interest,False,False,1.142857142857143,,1.0
+2025-06-30,Branch Transaction ACCOUNT FEE,40.0,0.0,Bank Charges & Interest,False,False,1.9047619047619047,,1.0
+2025-06-30,Electronic Funds Transfer GOVERNMENT CANADA,472.16,0.0,Income Tax Installment,False,False,22.483809523809526,,1.0
+2025-06-30,Internet Banking E-TRANSFER105516594938 Stony plain Mechanical 4506*********765,350.0,0.0,Bank Charges & Interest,False,False,16.666666666666664,,1.0
+2025-06-30,Point of Sale - Interac PURCHASE518021322763 SPRUCE GROVE GA 4506*********765,40.84,0.0,Fuel & Petroleum,False,True,1.944761904761905,Unclassified,1.0
+2025-06-30,Point of Sale - Interac PURCHASE518015252144 REDWATER HOME H 4506*********765,60.86,0.0,Equipment & Supplies,False,False,2.8980952380952383,,1.0
+2025-06-30,Point of Sale - Interac PURCHASE517918467536 CANADIAN TIRE S 4506*********765,50.91,0.0,Vehicle Repairs & Maintenance,False,True,2.4242857142857144,,1.0
+2025-06-30,Point of Sale - Interac PURCHASE336001001007 KENTWOOD FORD 4506*********765,18.13,0.0,Vehicle Repairs & Maintenance,False,True,0.8633333333333333,Unclassified,1.0
+2025-06-27,Electronic Funds Transfer GOVERNMENT CANADA,229.86,0.0,Income Tax Installment,False,False,10.945714285714287,,1.0
+2025-06-27,Point of Sale - Interac PURCHASE517818344168 PETRO-CANADA 37 4506*********765,53.12,0.0,Fuel & Petroleum,False,False,2.5295238095238095,,1.0
+2025-06-26,Point of Sale - Interac PURCHASE517719244333 PETRO-CANADA 37 4506*********765,60.04,0.0,Fuel & Petroleum,False,False,2.8590476190476193,,1.0
+2025-06-24,Point of Sale - Interac PURCHASE517511179778 PETRO-CANADA 37 4506*********765,45.06,0.0,Fuel & Petroleum,False,False,2.145714285714286,,1.0
+2025-06-23,Point of Sale - Interac PURCHASE517315456252 GCOC #00032 4506*********223,79.79,0.0,Fuel & Petroleum,False,False,3.79952380952381,,1.0
+2025-06-23,Point of Sale - Interac PURCHASE517207383880 PETRO-CANADA 37 4506*********765,50.14,0.0,Fuel & Petroleum,False,False,2.3876190476190478,,1.0
+2025-06-20,Point of Sale - Interac PURCHASE517100512247 REDWATER NAPA A 4506*********765,166.6,0.0,Vehicle Repairs & Maintenance,False,False,7.933333333333333,,1.0
+2025-06-20,Internet Banking E-TRANSFER105504292442 rent@realtyfocus.com 4506*********765,0.9,0.0,Office Rent - Commercial,False,False,0.04285714285714286,,1.0
+2025-06-20,Internet Banking INTERNET TRANSFER000000121391 TO: 00099/78-83439 4506*********765,1000.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-06-19,Point of Sale - Interac PURCHASE517012002489 RAINBOW RESTAUR 4506*********223,52.35,0.0,Meals & Entertainment (50%),False,False,2.492857142857143,,1.0
+2025-06-19,Point of Sale - Interac PURCHASE838001001051 FGP50206 FAS GA 4506*********765,19.38,0.0,Fuel & Petroleum,False,False,0.9228571428571428,,1.0
+2025-06-19,Point of Sale - Interac PURCHASE516920196063 PETRO-CANADA 37 4506*********765,40.28,0.0,Fuel & Petroleum,False,False,1.9180952380952383,,1.0
+2025-06-18,Internet Banking E-TRANSFER105501847136 Lilibeth Sejera 4506*********765,1000.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-06-17,Electronic Funds Transfer LOAN PAYMENT 000025198990969 SCOTIA BANK - SPL LOAN PAYMENT,535.73,0.0,Vehicle Lease/Loan Payment,True,False,25.510952380952382,,1.0
+2025-06-16,Electronic Funds Transfer LOAN PAYMENT BR : 3333 TD ON-LINE LOANS SYSTEM,1458.29,0.0,Vehicle Lease/Loan Payment,False,False,69.44238095238096,,1.0
+2025-06-16,Electronic Funds Transfer BILL PAYMENT Koodo Mobile,87.1,0.0,Bank Charges & Interest,False,False,4.147619047619047,,1.0
+2025-06-16,Point of Sale - Interac PURCHASE516719313146 PETRO-CANADA 37 4506*********765,51.48,0.0,Fuel & Petroleum,False,False,2.451428571428571,,1.0
+2025-06-16,Point of Sale - Interac PURCHASE516700507272 UNIVERSITY TRAD 4506*********765,65.5,0.0,Personal - Not Deductible,False,True,3.119047619047619,Unclassified,1.0
+2025-06-16,Point of Sale - Interac PURCHASE516700848936 THE ATLANTIC KI 4506*********765,156.38,0.0,Meals & Entertainment (50%),False,True,7.446666666666666,Unclassified,1.0
+2025-06-12,Electronic Funds Transfer GOVERNMENT CANADA,308.48,0.0,Income Tax Installment,False,False,14.689523809523811,,1.0
+2025-06-11,Internet Banking E-TRANSFER105493165145 rent@realtyfocus.com 4506*********765,152.53,0.0,Office Rent - Commercial,False,False,7.263333333333333,,1.0
+2025-06-10,Point of Sale - Interac PURCHASE516118456227 PETRO-CANADA 37 4506*********765,50.11,0.0,Fuel & Petroleum,False,False,2.386190476190476,,1.0
+2025-06-09,Internet Banking MOBILE DEPOSIT,0.0,147.0,Revenue,False,False,0.0,,0.0
+2025-06-09,Point of Sale - Interac PURCHASE515816380528 MOBIL@ - 1767 4506*********223,29.57,0.0,Fuel & Petroleum,False,False,1.408095238095238,,1.0
+2025-06-09,Point of Sale - Interac PURCHASE515814160775 PETRO-CANADA 77 4506*********765,57.13,0.0,Fuel & Petroleum,False,False,2.720476190476191,,1.0
+2025-06-06,Point of Sale - Interac PURCHASE399168110606 OK TIRE REDWATE 4506*********765,201.6,0.0,Vehicle Repairs & Maintenance,False,False,9.6,,1.0
+2025-06-06,Internet Banking E-TRANSFER105486796411 rent@realtyfocus.com 4506*********765,1600.0,0.0,Office Rent - Commercial,False,False,76.19047619047619,,1.0
+2025-06-06,Internet Banking INTERNET TRANSFER000000215010 TO: 00099/78-83439 4506*********765,5000.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-06-05,Electronic Funds Transfer INSURANCE MANULIFE FINANCIAL,31.89,0.0,Other / Unclassified,False,False,1.5185714285714285,,1.0
+2025-06-05,Branch Transaction WIRE TSF 0512223 PRICEWATERHOUSECOOPERS INC LONG RUN EXPL CONTRACTOR 2025,0.0,13293.75,Revenue,False,False,0.0,,0.0
+2025-06-03,Point of Sale - Interac PURCHASE515413130869 PETRO-CANADA 37 4506*********765,155.87,0.0,Fuel & Petroleum,False,False,7.422380952380953,,1.0
+2025-06-02,Electronic Funds Transfer BILL PAYMENT Koodo Mobile,70.6,0.0,Bank Charges & Interest,False,False,3.3619047619047615,,1.0
+2025-06-02,Point of Sale - Interac PURCHASE515312229595 PETRO-CANADA 37 4506*********765,20.0,0.0,Fuel & Petroleum,False,False,0.9523809523809523,,1.0
+2025-05-30,Branch Transaction ACCOUNT FEE,40.0,0.0,Bank Charges & Interest,False,False,1.9047619047619047,,1.0
+2025-05-30,Branch Transaction OVERDRAFT INTEREST,1.27,0.0,Bank Charges & Interest,False,False,0.060476190476190475,,1.0
+2025-05-30,Branch Transaction OVERDRAFT S/C,5.0,0.0,Bank Charges & Interest,False,True,0.23809523809523808,Unclassified,1.0
+2025-05-28,Electronic Funds Transfer GOVERNMENT CANADA,472.16,0.0,Income Tax Installment,False,False,22.483809523809526,,1.0
+2025-05-27,Internet Banking E-TRANSFER011323401393 LILIBETH SEJERA 4506*********765,0.0,1500.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-05-21,Internet Banking E-TRANSFER105463887544 Lilibeth Sejera 4506*********765,1500.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-05-21,Internet Banking E-TRANSFER105463726586 Lilibeth Sejera 4506*********765,1000.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-05-20,Electronic Funds Transfer LOAN PAYMENT 000025198990969 SCOTIA BANK - SPL LOAN PAYMENT,535.73,0.0,Vehicle Lease/Loan Payment,True,False,25.510952380952382,,1.0
+2025-05-20,Point of Sale - Interac PURCHASE514011251887 PETRO-CANADA 37 4506*********765,164.24,0.0,Fuel & Petroleum,False,False,7.820952380952382,,1.0
+2025-05-20,Point of Sale - Interac PURCHASE513815186439 SHELL C20294 4506*********765,57.45,0.0,Fuel & Petroleum,False,False,2.735714285714286,,1.0
+2025-05-20,Internet Banking INTERNET TRANSFER000000111281 TO: 00099/78-83439 4506*********765,3000.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-05-20,Point of Sale - Interac PURCHASE513800283990 SHELL C81527 4506*********765,30.91,0.0,Fuel & Petroleum,False,False,1.4719047619047618,,1.0
+2025-05-20,Point of Sale - Interac PURCHASE513723136687 INVERMERE CANNA 4506*********765,39.95,0.0,Personal - Not Deductible,False,True,1.9023809523809525,Unclassified,1.0
+2025-05-20,Point of Sale - Interac PURCHASE263001001019 CANCO PETROLEUM 4506*********765,47.11,0.0,Fuel & Petroleum,False,True,2.243333333333333,Unclassified,1.0
+2025-05-16,Point of Sale - Interac PURCHASE513522475008 MIDWAY ESSO 4506*********765,59.18,0.0,Fuel & Petroleum,False,False,2.818095238095238,,1.0
+2025-05-15,Electronic Funds Transfer BILL PAYMENT Koodo Mobile,87.1,0.0,Telephone & Internet,False,False,4.147619047619047,,1.0
+2025-05-14,Electronic Funds Transfer LOAN PAYMENT BR : 3333 TD ON-LINE LOANS SYSTEM,1458.29,0.0,Vehicle Lease/Loan Payment,False,False,69.44238095238096,,1.0
+2025-05-14,Internet Banking E-TRANSFER105455768695 rent@realtyfocus.com 4506*********765,1600.0,0.0,Office Rent - Commercial,False,False,76.19047619047619,,1.0
+2025-05-14,Point of Sale - Interac PURCHASE513416420469 REDWATER HOME H 4506*********765,108.77,0.0,Equipment & Supplies,False,False,5.179523809523809,,1.0
+2025-05-12,Electronic Funds Transfer GOVERNMENT CANADA,308.48,0.0,Income Tax Installment,False,False,14.689523809523811,,1.0
+2025-05-12,Point of Sale - Interac PURCHASE000043303132 MANILA GRILL EX 4506*********765,112.85,0.0,Meals & Entertainment (50%),True,False,5.373809523809523,,1.0
+2025-05-12,Point of Sale - Interac PURCHASE513016382482 REDWATER HOME H 4506*********765,23.09,0.0,Equipment & Supplies,False,False,1.0995238095238096,,1.0
+2025-05-09,Internet Banking E-TRANSFER105449639875 rent@realtyfocus.com 4506*********765,145.62,0.0,Office Rent - Commercial,False,False,6.934285714285714,,1.0
+2025-05-07,Point of Sale - Interac PURCHASE512715421537 PETRO-CANADA 37 4506*********765,161.23,0.0,Fuel & Petroleum,False,False,7.677619047619048,,1.0
+2025-05-07,Internet Banking INTERNET TRANSFER000000220960 TO: 00099/78-83439 4506*********765,5000.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-05-07,Point of Sale - Interac PURCHASE758001001075 FGP50206 FAS GA 4506*********765,35.14,0.0,Fuel & Petroleum,False,False,1.6733333333333333,,1.0
+2025-05-06,Branch Transaction WIRE TSF 0612670 PRICEWATERHOUSECOOPERS INC LONG RUN EXPLORATION INVOICE29,0.0,14181.0,Revenue,False,False,0.0,,0.0
+2025-05-06,Point of Sale - Interac PURCHASE512612956013 RAINBOW RESTAUR 4506*********765,9.98,0.0,Meals & Entertainment (50%),False,False,0.4752380952380953,,1.0
+2025-05-06,Point of Sale - Interac PURCHASE000001050014 DAIRY QUEEN #71 4506*********765,33.45,0.0,Meals & Entertainment (50%),False,False,1.5928571428571432,,1.0
+2025-05-06,Point of Sale - Interac PURCHASE756001001056 FGP50206 FAS GA 4506*********765,34.68,0.0,Fuel & Petroleum,False,False,1.6514285714285712,,1.0
+2025-05-05,Electronic Funds Transfer INSURANCE MANULIFE FINANCIAL,31.89,0.0,Other / Unclassified,False,False,1.5185714285714285,,1.0
+2025-05-05,Point of Sale - Interac PURCHASE995280370505 SOUTH FORT CHEV 4506*********765,26.45,0.0,Vehicle Repairs & Maintenance,False,True,1.2595238095238095,Unclassified,1.0
+2025-05-05,Point of Sale - Interac PURCHASE545001001240 FGP40219 HWY 15 4506*********765,9.15,0.0,Fuel & Petroleum,False,False,0.4357142857142857,,1.0
+2025-05-05,Point of Sale - Interac PURCHASE512512157705 MCDONALD'S #672 4506*********765,7.85,0.0,Meals & Entertainment (50%),False,False,0.3738095238095238,,1.0
+2025-05-05,Point of Sale - Interac PURCHASE754001001086 FGP50206 FAS GA 4506*********765,19.84,0.0,Fuel & Petroleum,False,False,0.9447619047619047,,1.0
+2025-05-05,Point of Sale - Interac PURCHASE512419348644 REDWATER COMMUN 4506*********765,60.0,0.0,Meals & Entertainment (50%),False,True,2.857142857142857,Unclassified,1.0
+2025-05-05,Point of Sale - Interac PURCHASE753001001151 FGP50206 FAS GA 4506*********765,30.6,0.0,Fuel & Petroleum,False,False,1.4571428571428573,,1.0
+2025-05-05,Point of Sale - Interac PURCHASE000024302684 LIQUOR STATION 4506*********765,10.12,0.0,Personal - Not Deductible,True,False,0.4819047619047619,,1.0
+2025-05-05,Point of Sale - Interac PURCHASE512314287193 PETRO-CANADA 38 4506*********765,37.46,0.0,Fuel & Petroleum,False,False,1.783809523809524,,1.0
+2025-05-05,Point of Sale - Interac PURCHASE512314133873 FATBURGER 4506*********765,30.01,0.0,Meals & Entertainment (50%),False,True,1.4290476190476191,Unclassified,1.0
+2025-05-02,Electronic Funds Transfer BILL PAYMENT Koodo Mobile,70.6,0.0,Bank Charges & Interest,False,False,3.3619047619047615,,1.0
+2025-05-02,Point of Sale - Interac PURCHASE512215471801 CPC / SCP 57770 4506*********223,18.89,0.0,Fuel & Petroleum,False,False,0.8995238095238096,,1.0
+2025-05-01,Point of Sale - Interac PURCHASE512116168232 PETRO-CANADA 37 4506*********765,137.91,0.0,Fuel & Petroleum,False,False,6.567142857142857,,1.0
+2025-05-01,Point of Sale - Interac PURCHASE747001001174 FGP50206 FAS GA 4506*********765,33.89,0.0,Fuel & Petroleum,False,False,1.6138095238095238,,1.0
+2025-04-30,Branch Transaction ACCOUNT FEE,40.0,0.0,Bank Charges & Interest,False,False,1.9047619047619047,,1.0
+2025-04-30,Point of Sale - Interac PURCHASE000024302274 LIQUOR STATION 4506*********765,10.12,0.0,Personal - Not Deductible,True,False,0.4819047619047619,,1.0
+2025-04-30,Point of Sale - Interac PURCHASE000001041012 DAIRY QUEEN #71 4506*********765,17.0,0.0,Meals & Entertainment (50%),False,False,0.8095238095238095,,1.0
+2025-04-30,Point of Sale - Interac PURCHASE745001001106 FGP50206 FAS GA 4506*********765,30.6,0.0,Fuel & Petroleum,False,False,1.4571428571428573,,1.0
+2025-04-30,Point of Sale - Interac PURCHASE000001132051 REDWATER IGA #1 4506*********765,29.26,0.0,Meals & Entertainment (50%),True,False,1.3933333333333333,,1.0
+2025-04-30,Point of Sale - Interac PURCHASE512013157513 REDWATER HOME H 4506*********765,31.49,0.0,Equipment & Supplies,False,False,1.4995238095238095,,1.0
+2025-04-29,Point of Sale - Interac PURCHASE744001001017 FGP50206 FAS GA 4506*********765,17.3,0.0,Fuel & Petroleum,False,False,0.8238095238095239,,1.0
+2025-04-29,Point of Sale - Interac PURCHASE743001001058 FGP50206 FAS GA 4506*********765,19.84,0.0,Fuel & Petroleum,False,False,0.9447619047619047,,1.0
+2025-04-28,Electronic Funds Transfer GOVERNMENT CANADA,472.16,0.0,Income Tax Installment,False,False,22.483809523809526,,1.0
+2025-04-28,Point of Sale - Interac PURCHASE742001001091 FGP50206 FAS GA 4506*********765,15.3,0.0,Fuel & Petroleum,False,False,0.7285714285714286,,1.0
+2025-04-28,Point of Sale - Interac PURCHASE000001130111 REDWATER IGA #1 4506*********765,17.38,0.0,Meals & Entertainment (50%),True,False,0.8276190476190476,,1.0
+2025-04-28,Point of Sale - Interac PURCHASE511810106114 PETRO-CANADA 37 4506*********765,43.86,0.0,Fuel & Petroleum,False,False,2.0885714285714285,,1.0
+2025-04-28,Point of Sale - Interac PURCHASE741001001007 FGP50206 FAS GA 4506*********765,34.63,0.0,Fuel & Petroleum,False,False,1.6490476190476193,,1.0
+2025-04-28,Point of Sale - Interac PURCHASE511617407794 JYSK 022 SOUTHP 4506*********223,136.45,0.0,Home Office Expenses,False,True,6.497619047619047,Unclassified,1.0
+2025-04-28,Point of Sale - Interac PURCHASE000001001929 RED APPLE #5306 4506*********765,25.98,0.0,Office Supplies,True,False,1.2371428571428573,,1.0
+2025-04-28,Point of Sale - Interac PURCHASE738001001026 FGP50206 FAS GA 4506*********765,23.5,0.0,Fuel & Petroleum,False,False,1.119047619047619,,1.0
+2025-04-22,Point of Sale - Interac PURCHASE511121100960 MOBIL@ - 3817 4506*********765,153.96,0.0,Fuel & Petroleum,False,False,7.331428571428572,,1.0
+2025-04-21,Point of Sale - Interac PURCHASE511119411706 JIFFY LUBE 4506*********765,278.85,0.0,Vehicle Repairs & Maintenance,False,False,13.27857142857143,,1.0
+2025-04-21,Point of Sale - Interac PURCHASE511019246883 SHELL C22508 4506*********765,150.0,0.0,Fuel & Petroleum,False,False,7.142857142857142,,1.0
+2025-04-21,Point of Sale - Interac PURCHASE140001001184 FGP50329 O'PUR 4506*********765,39.04,0.0,Fuel & Petroleum,False,False,1.8590476190476188,,1.0
+2025-04-21,Point of Sale - Interac PURCHASE511014147583 CANADIAN TIRE # 4506*********765,203.71,0.0,Vehicle Repairs & Maintenance,False,True,9.700476190476191,,1.0
+2025-04-21,Point of Sale - Interac PURCHASE510723158023 PETRO-CANADA 77 4506*********765,147.99,0.0,Fuel & Petroleum,False,False,7.047142857142857,,1.0
+2025-04-21,Point of Sale - Interac PURCHASE000001001464 WALMART STORE # 4506*********765,109.56,0.0,Personal - Not Deductible,True,True,5.217142857142858,,1.0
+2025-04-17,Electronic Funds Transfer LOAN PAYMENT 000025198990969 SCOTIA BANK - SPL LOAN PAYMENT,535.73,0.0,Vehicle Lease/Loan Payment,True,False,25.510952380952382,,1.0
+2025-04-17,Point of Sale - Interac PURCHASE510719100276 PETRO-CANADA 37 4506*********765,160.26,0.0,Fuel & Petroleum,False,False,7.631428571428571,,1.0
+2025-04-17,Point of Sale - Interac PURCHASE197280450417 OK TIRE REDWATE 4506*********765,222.6,0.0,Vehicle Repairs & Maintenance,False,False,10.6,,1.0
+2025-04-16,Internet Banking E-TRANSFER105418046536 rent@realtyfocus.com 4506*********765,224.77,0.0,Office Rent - Commercial,False,False,10.703333333333335,,1.0
+2025-04-15,Electronic Funds Transfer BILL PAYMENT Koodo Mobile,87.1,0.0,Bank Charges & Interest,False,False,4.147619047619047,,1.0
+2025-04-15,Internet Banking E-TRANSFER105416014053 Lilibeth Sejera 4506*********765,3000.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-04-14,Electronic Funds Transfer LOAN PAYMENT BR : 3333 TD ON-LINE LOANS SYSTEM,1458.29,0.0,Vehicle Lease/Loan Payment,False,False,69.44238095238096,,1.0
+2025-04-14,Electronic Funds Transfer GOVERNMENT CANADA,308.48,0.0,Income Tax Installment,False,False,14.689523809523811,,1.0
+2025-04-14,Point of Sale - Interac PURCHASE510312146673 REDWATER HOME H 4506*********765,38.83,0.0,Equipment & Supplies,False,False,1.849047619047619,,1.0
+2025-04-10,Point of Sale - Interac PURCHASE510016264105 PETRO-CANADA 37 4506*********765,164.51,0.0,Fuel & Petroleum,False,False,7.833809523809523,,1.0
+2025-04-09,Internet Banking INTERNET TRANSFER000000239327 TO: 00099/78-83439 4506*********765,5000.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-04-07,Electronic Funds Transfer INSURANCE MANULIFE FINANCIAL,31.89,0.0,Other / Unclassified,False,False,1.5185714285714285,,1.0
+2025-04-07,Point of Sale - Interac PURCHASE509719441793 CIRCLE K #22734 4506*********765,48.65,0.0,Fuel & Petroleum,False,False,2.316666666666667,,1.0
+2025-04-07,Point of Sale - Interac PURCHASE250407754972 LS JOBSITE WORK 4506*********765,312.87,0.0,PPE & Safety Equipment,False,True,14.89857142857143,Unclassified,1.0
+2025-04-07,Internet Banking E-TRANSFER105406068880 rent@realtyfocus.com 4506*********765,1600.0,0.0,Office Rent - Commercial,False,False,76.19047619047619,,1.0
+2025-04-07,Point of Sale - Interac PURCHASE509617142527 SHELL C00103 4506*********765,43.6,0.0,Fuel & Petroleum,False,False,2.0761904761904764,,1.0
+2025-04-07,Point of Sale - Interac PURCHASE509615358684 VALEMOUNT ESSO 4506*********765,25.0,0.0,Fuel & Petroleum,False,False,1.1904761904761905,,1.0
+2025-04-04,Point of Sale - Interac PURCHASE509413191424 PETRO-CANADA 78 4506*********765,47.17,0.0,Fuel & Petroleum,False,False,2.2461904761904763,,1.0
+2025-04-04,Internet Banking E-TRANSFER105402873861 rent@realtyfocus.com 4506*********765,229.33,0.0,Office Rent - Commercial,False,False,10.920476190476192,,1.0
+2025-04-03,Branch Transaction WIRE TSF 0305797 PRICEWATERHOUSECOOPERS INC LONG RUN EXPL INV 28 LONG RUN,0.0,15273.0,Revenue,False,False,0.0,,0.0
+2025-04-02,Electronic Funds Transfer BILL PAYMENT Koodo Mobile,70.6,0.0,Bank Charges & Interest,False,False,3.3619047619047615,,1.0
+2025-03-31,Branch Transaction ACCOUNT FEE,40.0,0.0,Bank Charges & Interest,False,False,1.9047619047619047,,1.0
+2025-03-31,Point of Sale - Interac PURCHASE508918168210 PETRO-CANADA 37 4506*********765,198.77,0.0,Fuel & Petroleum,False,False,9.465238095238096,,1.0
+2025-03-31,Point of Sale - Interac PURCHASE508918148841 PETRO-CANADA 37 4506*********765,32.54,0.0,Fuel & Petroleum,False,False,1.5495238095238095,,1.0
+2025-03-28,Electronic Funds Transfer GOVERNMENT CANADA,472.16,0.0,Income Tax Installment,False,False,22.483809523809526,,1.0
+2025-03-28,Point of Sale - Interac PURCHASE508715404630 PETRO-CANADA 37 4506*********765,106.53,0.0,Fuel & Petroleum,False,False,5.072857142857143,,1.0
+2025-03-28,Point of Sale - Interac PURCHASE508715238779 ACHTI'S STEAK & 4506*********765,100.88,0.0,Meals & Entertainment (50%),False,False,4.803809523809524,,1.0
+2025-03-26,Point of Sale - Interac PURCHASE508511252537 PETRO-CANADA 37 4506*********765,100.01,0.0,Fuel & Petroleum,False,False,4.762380952380953,,1.0
+2025-03-24,Point of Sale - Interac PURCHASE508314278580 PETRO-CANADA 87 4506*********765,16.87,0.0,Fuel & Petroleum,False,False,0.8033333333333335,,1.0
+2025-03-24,Point of Sale - Interac PURCHASE674001001038 FGP50206 FAS GA 4506*********765,35.14,0.0,Fuel & Petroleum,False,False,1.6733333333333333,,1.0
+2025-03-24,Point of Sale - Interac PURCHASE508217119305 PETRO-CANADA 37 4506*********765,58.83,0.0,Fuel & Petroleum,False,False,2.801428571428571,,1.0
+2025-03-24,Internet Banking INTERNET TRANSFER000000113150 TO: 00099/78-83439 4506*********765,3000.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-03-24,Point of Sale - Interac PURCHASE672001001052 FGP50206 FAS GA 4506*********765,30.6,0.0,Fuel & Petroleum,False,False,1.4571428571428573,,1.0
+2025-03-24,Point of Sale - Interac PURCHASE000024302952 LIQUOR STATION 4506*********765,9.42,0.0,Personal - Not Deductible,True,False,0.44857142857142857,,1.0
+2025-03-24,Point of Sale - Interac PURCHASE508116317082 MCDONALD'S #400 4506*********765,12.78,0.0,Meals & Entertainment (50%),False,False,0.6085714285714285,,1.0
+2025-03-24,Point of Sale - Interac PURCHASE508116179316 UPMEN BARBERS 4506*********765,77.8,0.0,Personal - Not Deductible,True,False,3.704761904761905,,1.0
+2025-03-24,Point of Sale - Interac PURCHASE670001001071 FGP50206 FAS GA 4506*********765,30.6,0.0,Fuel & Petroleum,False,False,1.4571428571428573,,1.0
+2025-03-24,Point of Sale - Interac PURCHASE508020909790 RAINBOW RESTAUR 4506*********765,22.95,0.0,Meals & Entertainment (50%),False,False,1.0928571428571427,,1.0
+2025-03-24,Point of Sale - Interac PURCHASE137683863921 SQ *REDWATER DE 4506*********765,136.6,0.0,Equipment & Supplies,False,True,6.504761904761905,Unclassified,1.0
+2025-03-21,Point of Sale - Interac PURCHASE001001001570 7-ELEVEN #33670 4506*********765,18.88,0.0,Fuel & Petroleum,False,True,0.899047619047619,Unclassified,1.0
+2025-03-21,Point of Sale - Interac PURCHASE508014157475 PETRO-CANADA 39 4506*********765,60.0,0.0,Fuel & Petroleum,False,False,2.857142857142857,,1.0
+2025-03-21,Point of Sale - Interac PURCHASE405001001008 SOUTHFORT VETER 4506*********765,232.62,0.0,PPE & Safety Equipment,False,True,11.077142857142857,Unclassified,1.0
+2025-03-19,Internet Banking INTERNET TRANSFER000000127695 TO: 00099/78-83439 4506*********765,3000.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-03-17,Electronic Funds Transfer BILL PAYMENT Koodo Mobile,87.1,0.0,Bank Charges & Interest,False,False,4.147619047619047,,1.0
+2025-03-17,Electronic Funds Transfer LOAN PAYMENT 000025198990969 SCOTIA BANK - SPL LOAN PAYMENT,535.73,0.0,Vehicle Lease/Loan Payment,True,False,25.510952380952382,,1.0
+2025-03-17,Internet Banking E-TRANSFER105377894592 rent@realtyfocus.com 4506*********765,1600.0,0.0,Office Rent - Commercial,False,False,76.19047619047619,,1.0
+2025-03-17,Point of Sale - Interac PURCHASE507512192292 PETRO-CANADA 37 4506*********765,120.03,0.0,Fuel & Petroleum,False,False,5.715714285714285,,1.0
+2025-03-14,Electronic Funds Transfer LOAN PAYMENT BR : 3333 TD ON-LINE LOANS SYSTEM,1458.29,0.0,Vehicle Lease/Loan Payment,False,False,69.44238095238096,,1.0
+2025-03-13,Internet Banking E-TRANSFER105372615813 Lilibeth Sejera 4506*********765,3000.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-03-12,Electronic Funds Transfer GOVERNMENT CANADA,308.48,0.0,Income Tax Installment,False,False,14.689523809523811,,1.0
+2025-03-12,Point of Sale - Interac PURCHASE507118192047 PETRO-CANADA 37 4506*********223,20.0,0.0,Fuel & Petroleum,False,False,0.9523809523809523,,1.0
+2025-03-12,Point of Sale - Interac PURCHASE507115300591 PETRO-CANADA 37 4506*********765,165.87,0.0,Fuel & Petroleum,False,False,7.898571428571428,,1.0
+2025-03-10,Point of Sale - Interac PURCHASE506914191360 LILY'S STEAK & 4506*********765,78.82,0.0,Meals & Entertainment (50%),False,True,3.753333333333333,Unclassified,1.0
+2025-03-10,Point of Sale - Interac PURCHASE645001001096 FGP50206 FAS GA 4506*********765,34.63,0.0,Fuel & Petroleum,False,False,1.6490476190476193,,1.0
+2025-03-07,Point of Sale - Interac PURCHASE506619220360 PETRO-CANADA 37 4506*********765,119.71,0.0,Fuel & Petroleum,False,False,5.7004761904761905,,1.0
+2025-03-07,Branch Transaction WITHDRAWAL 06079 REDWATER BANKING CENTRE,260.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-03-07,Branch Transaction DEPOSIT 06079 REDWATER BANKING CENTRE,0.0,882.01,Revenue,False,False,0.0,,0.0
+2025-03-07,Internet Banking INTERNET TRANSFER000000112446 TO: 00099/78-83439 4506*********765,3000.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-03-07,Branch Transaction WIRE TSF 0748784 LONG RUN EXPLORATION /ROC/009483113125156,0.0,17525.25,Revenue,False,False,0.0,,0.0
+2025-03-06,Point of Sale - Interac PURCHASE506515105663 PETRO-CANADA 37 4506*********765,100.56,0.0,Fuel & Petroleum,False,False,4.788571428571429,,1.0
+2025-03-05,Electronic Funds Transfer INSURANCE MANULIFE FINANCIAL,63.78,0.0,Other / Unclassified,False,False,3.037142857142857,,1.0
+2025-03-05,Point of Sale - Interac PURCHASE992646130305 LITTLE STEPS DE 4506*********223,360.0,0.0,Other / Unclassified,True,False,17.142857142857142,,1.0
+2025-03-03,Electronic Funds Transfer BILL PAYMENT Koodo Mobile,168.25,0.0,Bank Charges & Interest,False,False,8.011904761904761,,1.0
+2025-03-03,Point of Sale - Interac PURCHASE467001001006 REDWATER NAPA 4506*********765,28.34,0.0,Vehicle Repairs & Maintenance,False,False,1.3495238095238096,,1.0
+2025-03-03,Point of Sale - Interac PURCHASE506112452746 PETRO-CANADA 37 4506*********765,160.47,0.0,Fuel & Petroleum,False,False,7.6414285714285715,,1.0
+2025-02-28,Branch Transaction ACCOUNT FEE,40.0,0.0,Bank Charges & Interest,False,False,1.9047619047619047,,1.0
+2025-02-28,Branch Transaction OVERDRAFT INTEREST,0.05,0.0,Bank Charges & Interest,False,False,0.002380952380952381,,1.0
+2025-02-28,Branch Transaction OVERDRAFT S/C,5.0,0.0,Bank Charges & Interest,False,True,0.23809523809523808,Unclassified,1.0
+2025-02-28,Electronic Funds Transfer GOVERNMENT CANADA,472.16,0.0,Income Tax Installment,False,False,22.483809523809526,,1.0
+2025-02-28,Point of Sale - Interac PURCHASE000001144166 REDWATER ESSO 4506*********765,35.07,0.0,Fuel & Petroleum,False,False,1.67,,1.0
+2025-02-26,Point of Sale - Interac PURCHASE505715191440 BOYLE PAY @ PUM 4506*********765,153.33,0.0,Fuel & Petroleum,False,True,7.3014285714285725,Unclassified,1.0
+2025-02-26,Point of Sale - Interac PURCHASE991636120226 KEEPS MECHANICA 4506*********765,7644.68,0.0,Vehicle Lease/Loan Payment,False,True,364.03238095238095,Unclassified,1.0
+2025-02-26,Point of Sale - Interac PURCHASE505711167145 PETRO-CANADA 37 4506*********765,118.59,0.0,Fuel & Petroleum,False,False,5.647142857142858,,1.0
+2025-02-25,Point of Sale - Interac PURCHASE505519061286 RAINBOW RESTAUR 4506*********765,37.8,0.0,Meals & Entertainment (50%),False,False,1.7999999999999998,,1.0
+2025-02-24,Point of Sale - Interac PURCHASE505413279243 PETRO-CANADA 37 4506*********765,43.37,0.0,Fuel & Petroleum,False,False,2.065238095238095,,1.0
+2025-02-21,Point of Sale - Interac PURCHASE505219256379 PETRO-CANADA 78 4506*********765,46.58,0.0,Fuel & Petroleum,False,False,2.218095238095238,,1.0
+2025-02-21,Point of Sale - Interac PURCHASE980001001012 7 ELEVEN STORE 4506*********765,9.82,0.0,Fuel & Petroleum,False,True,0.46761904761904766,Unclassified,1.0
+2025-02-21,Point of Sale - Interac PURCHASE505212256834 MOBILE Q 4506*********765,63.0,0.0,Fuel & Petroleum,False,False,3.0,,1.0
+2025-02-21,Internet Banking INTERNET TRANSFER000000103198 TO: 00099/78-83439 4506*********765,3000.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-02-20,Point of Sale - Interac PURCHASE505109885949 TIM HORTONS #76 4506*********765,2.72,0.0,Meals & Entertainment (50%),False,False,0.12952380952380954,,1.0
+2025-02-20,Point of Sale - Interac PURCHASE505109885476 TIM HORTONS #76 4506*********765,37.25,0.0,Meals & Entertainment (50%),False,False,1.7738095238095237,,1.0
+2025-02-20,Point of Sale - Interac PURCHASE610001001073 FGP50206 FAS GA 4506*********765,30.6,0.0,Fuel & Petroleum,False,False,1.4571428571428573,,1.0
+2025-02-20,Point of Sale - Interac PURCHASE505020776986 RAINBOW RESTAUR 4506*********765,115.25,0.0,Meals & Entertainment (50%),False,False,5.488095238095238,,1.0
+2025-02-18,Electronic Funds Transfer BILL PAYMENT Koodo Mobile,94.82,0.0,Bank Charges & Interest,False,False,4.515238095238095,,1.0
+2025-02-18,Electronic Funds Transfer LOAN PAYMENT 000025198990969 SCOTIA BANK - SPL LOAN PAYMENT,535.73,0.0,Vehicle Lease/Loan Payment,True,False,25.510952380952382,,1.0
+2025-02-17,Internet Banking E-TRANSFER105341988931 rent@realtyfocus.com 4506*********765,100.0,0.0,Office Rent - Commercial,False,False,4.761904761904762,,1.0
+2025-02-17,Point of Sale - Interac PURCHASE504720436570 PETRO-CANADA 37 4506*********223,40.0,0.0,Fuel & Petroleum,False,False,1.9047619047619047,,1.0
+2025-02-17,Automated Banking Machine ABM WITHDRAWAL 2A97 REDWATER 18242 4506*********765,200.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-02-17,Point of Sale - Interac PURCHASE504715299985 PETRO-CANADA 37 4506*********765,143.91,0.0,Fuel & Petroleum,False,False,6.852857142857142,,1.0
+2025-02-17,Point of Sale - Interac PURCHASE504521134240 ACHTI'S STEAK & 4506*********765,78.85,0.0,Meals & Entertainment (50%),False,False,3.7547619047619043,,1.0
+2025-02-14,Electronic Funds Transfer LOAN PAYMENT BR : 3333 TD ON-LINE LOANS SYSTEM,1458.29,0.0,Revenue,False,False,0.0,,0.0
+2025-02-13,Point of Sale - Interac PURCHASE504415295051 REDWATER HOME H 4506*********765,38.84,0.0,Equipment & Supplies,False,False,1.8495238095238096,,1.0
+2025-02-12,Electronic Funds Transfer GOVERNMENT CANADA,308.48,0.0,Income Tax Installment,False,False,14.689523809523811,,1.0
+2025-02-12,Internet Banking INTERNET BILL PMT000000136230 ATCO ENERGY 4506*********765,176.69,0.0,Utilities,False,True,8.413809523809524,Unclassified,1.0
+2025-02-12,Internet Banking E-TRANSFER105336782467 rent@realtyfocus.com 4506*********765,225.74,0.0,Office Rent - Commercial,False,False,10.74952380952381,,1.0
+2025-02-12,Internet Banking E-TRANSFER105336780894 rent@realtyfocus.com 4506*********765,219.41,0.0,Office Rent - Commercial,False,False,10.448095238095238,,1.0
+2025-02-12,Internet Banking E-TRANSFER105336778619 rent@realtyfocus.com 4506*********765,1550.0,0.0,Office Rent - Commercial,False,False,73.80952380952381,,1.0
+2025-02-12,Point of Sale - Interac PURCHASE504316280140 PETRO-CANADA 37 4506*********765,200.0,0.0,Fuel & Petroleum,False,False,9.523809523809524,,1.0
+2025-02-12,Point of Sale - Interac PURCHASE504313192477 GOODBRAND AUTO 4506*********765,333.27,0.0,Vehicle Repairs & Maintenance,False,True,15.87,Unclassified,1.0
+2025-02-10,Point of Sale - Interac PURCHASE504010373034 PETRO-CANADA 37 4506*********765,200.0,0.0,Fuel & Petroleum,False,False,9.523809523809524,,1.0
+2025-02-10,Point of Sale - Interac PURCHASE001001001687 REAL CDN. SUPER 4506*********223,428.61,0.0,Personal - Not Deductible,False,True,20.41,Unclassified,1.0
+2025-02-10,Point of Sale - Interac PURCHASE503911162880 PETRO-CANADA 37 4506*********223,40.0,0.0,Fuel & Petroleum,False,False,1.9047619047619047,,1.0
+2025-02-07,Internet Banking INTERNET TRANSFER000000102129 TO: 00099/78-83439 4506*********765,3000.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-02-07,Automated Banking Machine ABM WITHDRAWAL 2A97 REDWATER 18242 4506*********765,200.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-02-07,Point of Sale - Interac PURCHASE503815200639 ACHTI'S STEAK & 4506*********223,45.8,0.0,Meals & Entertainment (50%),False,False,2.1809523809523808,,1.0
+2025-02-07,Branch Transaction WIRE TSF 0757526 LONG RUN EXPLORATION /ROC/009483111632729,0.0,24486.75,Revenue,False,False,0.0,,0.0
+2025-02-05,Branch Transaction EFT DR REVERSAL MANULIFE FINANCIAL,0.0,31.89,Transfer - Non-Taxable,False,False,0.0,,1.0
+2025-02-05,Branch Transaction NSF CHARGE MANULIFE FINANCIAL,45.0,0.0,Bank Charges & Interest,False,False,2.142857142857143,,1.0
+2025-02-05,Electronic Funds Transfer INSURANCE MANULIFE FINANCIAL,31.89,0.0,Other / Unclassified,False,False,1.5185714285714285,,1.0
+2025-02-03,Branch Transaction EFT DR REVERSAL KOODO MOBILE,0.0,70.6,Transfer - Non-Taxable,False,False,0.0,,1.0
+2025-02-03,Branch Transaction NSF CHARGE KOODO MOBILE,45.0,0.0,Bank Charges & Interest,False,False,2.142857142857143,,1.0
+2025-02-03,Electronic Funds Transfer BILL PAYMENT Koodo Mobile,70.6,0.0,Bank Charges & Interest,False,False,3.3619047619047615,,1.0
+2025-02-03,Point of Sale - Interac PURCHASE503416358262 PETRO-CANADA 37 4506*********765,40.0,0.0,Fuel & Petroleum,False,False,1.9047619047619047,,1.0
+2025-01-31,Branch Transaction ACCOUNT FEE,40.0,0.0,Bank Charges & Interest,False,False,1.9047619047619047,,1.0
+2025-01-30,Point of Sale - Interac PURCHASE503015159637 PETRO-CANADA 37 4506*********765,200.0,0.0,Fuel & Petroleum,False,False,9.523809523809524,,1.0
+2025-01-30,Point of Sale - Interac PURCHASE000001362002 LUCKY-7 CONVENI 4506*********223,40.0,0.0,Fuel & Petroleum,False,True,1.9047619047619047,Unclassified,1.0
+2025-01-29,Point of Sale - Interac PURCHASE502918227992 PETRO-CANADA 37 4506*********223,10.0,0.0,Fuel & Petroleum,False,False,0.47619047619047616,,1.0
+2025-01-28,Electronic Funds Transfer GOVERNMENT CANADA,472.16,0.0,Income Tax Installment,False,False,22.483809523809526,,1.0
+2025-01-27,Point of Sale - Interac PURCHASE502719241753 PETRO-CANADA 37 4506*********765,104.19,0.0,Fuel & Petroleum,False,False,4.961428571428572,,1.0
+2025-01-27,Point of Sale - Interac PURCHASE502518724761 RAINBOW RESTAUR 4506*********765,68.91,0.0,Meals & Entertainment (50%),False,False,3.281428571428571,,1.0
+2025-01-24,Point of Sale - Interac PURCHASE502419488563 SHELL C81565 4506*********223,40.0,0.0,Fuel & Petroleum,False,False,1.9047619047619047,,1.0
+2025-01-24,Point of Sale - Interac PURCHASE000066315399 PARK MAZDA 4506*********223,619.5,0.0,Vehicle Repairs & Maintenance,False,True,29.5,Unclassified,1.0
+2025-01-23,Point of Sale - Interac PURCHASE554001001155 FGP50206 FAS GA 4506*********765,14.68,0.0,Fuel & Petroleum,False,False,0.699047619047619,,1.0
+2025-01-23,Point of Sale - Interac PURCHASE000001001720 RED APPLE #5306 4506*********765,51.96,0.0,Office Supplies,True,False,2.4742857142857146,,1.0
+2025-01-23,Point of Sale - Interac PURCHASE502314416580 ACHTI'S STEAK & 4506*********765,72.5,0.0,Meals & Entertainment (50%),False,False,3.452380952380952,,1.0
+2025-01-23,Point of Sale - Interac PURCHASE502312496037 PETRO-CANADA 37 4506*********765,200.0,0.0,Fuel & Petroleum,False,False,9.523809523809524,,1.0
+2025-01-20,Point of Sale - Interac PURCHASE502015164824 ACHTI'S STEAK & 4506*********765,91.54,0.0,Meals & Entertainment (50%),False,False,4.35904761904762,,1.0
+2025-01-20,Internet Banking INTERNET BILL PMT000000108462 WORKERS COMP. BOARD OF AL 4506*********765,204.6,0.0,Professional Fees,False,False,9.742857142857142,,1.0
+2025-01-20,Point of Sale - Interac PURCHASE501811273545 PETRO-CANADA 37 4506*********223,40.0,0.0,Fuel & Petroleum,False,False,1.9047619047619047,,1.0
+2025-01-20,Point of Sale - Interac PURCHASE501811416542 PETRO-CANADA 37 4506*********765,56.31,0.0,Fuel & Petroleum,False,False,2.6814285714285715,,1.0
+2025-01-20,Internet Banking INTERNET TRANSFER000000132113 TO: 00099/78-83439 4506*********765,3000.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-01-17,Electronic Funds Transfer LOAN PAYMENT 000025198990969 SCOTIA BANK - SPL LOAN PAYMENT,535.73,0.0,Vehicle Lease/Loan Payment,True,False,25.510952380952382,,1.0
+2025-01-16,Point of Sale - Interac PURCHASE724217270116 OK TIRE REDWATE 4506*********765,218.24,0.0,Vehicle Repairs & Maintenance,False,False,10.392380952380952,,1.0
+2025-01-16,Point of Sale - Interac PURCHASE501615361703 PETRO-CANADA 37 4506*********765,150.19,0.0,Fuel & Petroleum,False,False,7.1519047619047615,,1.0
+2025-01-15,Electronic Funds Transfer BILL PAYMENT Koodo Mobile,87.94,0.0,Bank Charges & Interest,False,False,4.187619047619048,,1.0
+2025-01-14,Electronic Funds Transfer LOAN PAYMENT BR : 3333 TD ON-LINE LOANS SYSTEM,1458.29,0.0,Vehicle Lease/Loan Payment,False,False,69.44238095238096,,1.0
+2025-01-13,Electronic Funds Transfer GOVERNMENT CANADA,308.48,0.0,Income Tax Installment,False,False,14.689523809523811,,1.0
+2025-01-13,Point of Sale - Interac PURCHASE501314477181 PETRO-CANADA 37 4506*********223,20.0,0.0,Fuel & Petroleum,False,False,0.9523809523809523,,1.0
+2025-01-13,Point of Sale - Interac PURCHASE432001001008 REDWATER NAPA 4506*********765,90.79,0.0,Vehicle Repairs & Maintenance,False,False,4.323333333333333,,1.0
+2025-01-13,Point of Sale - Interac PURCHASE000001001961 WALMART STORE # 4506*********223,150.19,0.0,Personal - Not Deductible,True,True,7.1519047619047615,,1.0
+2025-01-13,Automated Banking Machine ABM WITHDRAWAL 2A97 REDWATER 18242 4506*********765,1700.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-01-13,Point of Sale - Interac PURCHASE001001001020 PRINCESS AUTO 3 4506*********223,75.05,0.0,Equipment & Supplies,False,False,3.5738095238095235,,1.0
+2025-01-13,Internet Banking E-TRANSFER105297472343 rent@realtyfocus.com 4506*********765,1550.0,0.0,Office Rent - Commercial,False,False,73.80952380952381,,1.0
+2025-01-13,Point of Sale - Interac PURCHASE501211241654 PETRO-CANADA 37 4506*********765,200.0,0.0,Fuel & Petroleum,False,False,9.523809523809524,,1.0
+2025-01-13,Point of Sale - Interac PURCHASE501117277174 PART SOURCE #80 4506*********765,372.31,0.0,Vehicle Repairs & Maintenance,False,False,17.72904761904762,,1.0
+2025-01-13,Point of Sale - Interac PURCHASE501117278667 JIFFY LUBE 4506*********765,333.88,0.0,Vehicle Repairs & Maintenance,False,False,15.899047619047618,,1.0
+2025-01-13,Point of Sale - Interac PURCHASE501109417458 PETRO-CANADA 37 4506*********765,155.58,0.0,Fuel & Petroleum,False,False,7.408571428571429,,1.0
+2025-01-10,Point of Sale - Interac PURCHASE992770590110 HOLDEN COLONY P 4506*********223,90.0,0.0,Office Rent - Commercial,True,False,4.285714285714286,,1.0
+2025-01-10,Point of Sale - Interac PURCHASE501011241416 PETRO-CANADA 37 4506*********223,40.0,0.0,Fuel & Petroleum,False,False,1.9047619047619047,,1.0
+2025-01-09,Internet Banking INTERNET TRANSFER000000218043 TO: 00099/78-83439 4506*********765,3000.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2025-01-08,Branch Transaction WIRE TSF 0806540 LONG RUN EXPLORATION /ROC/009483110054682,0.0,13566.75,Revenue,False,False,0.0,,0.0
+2025-01-07,Point of Sale - Interac PURCHASE500713117250 PETRO-CANADA 37 4506*********765,151.98,0.0,Fuel & Petroleum,False,False,7.237142857142857,,1.0
+2025-01-06,Electronic Funds Transfer INSURANCE MANULIFE FINANCIAL,31.89,0.0,Other / Unclassified,False,False,1.5185714285714285,,1.0
+2025-01-06,Point of Sale - Interac PURCHASE500413493465 PETRO-CANADA 37 4506*********765,165.21,0.0,Fuel & Petroleum,False,False,7.867142857142857,,1.0
+2025-01-03,Point of Sale - Interac PURCHASE426001001011 REDWATER NAPA 4506*********765,300.28,0.0,Vehicle Repairs & Maintenance,False,False,14.299047619047618,,1.0
+2025-01-03,Point of Sale - Interac PURCHASE426001001006 REDWATER NAPA 4506*********765,80.2,0.0,Vehicle Repairs & Maintenance,False,False,3.8190476190476197,,1.0
+2025-01-02,Electronic Funds Transfer BILL PAYMENT Koodo Mobile,70.6,0.0,Bank Charges & Interest,False,False,3.3619047619047615,,1.0
+2025-01-02,Point of Sale - Interac PURCHASE500111426561 PETRO-CANADA 37 4506*********765,150.45,0.0,Fuel & Petroleum,False,False,7.164285714285714,,1.0
+2024-12-31,Branch Transaction ACCOUNT FEE,40.0,0.0,Bank Charges & Interest,False,False,1.9047619047619047,,1.0
+2024-12-30,Electronic Funds Transfer GOVERNMENT CANADA,472.16,0.0,Income Tax Installment,False,False,22.483809523809526,,1.0
+2024-12-30,Point of Sale - Interac PURCHASE436512100706 PETRO-CANADA 37 4506*********765,47.45,0.0,Fuel & Petroleum,False,False,2.2595238095238095,,1.0
+2024-12-30,Point of Sale - Interac PURCHASE000001001069 WALMART STORE # 4506*********765,112.81,0.0,Personal - Not Deductible,True,True,5.371904761904762,,1.0
+2024-12-27,Point of Sale - Interac PURCHASE000043307768 SNOW VALLEY FOO 4506*********223,48.57,0.0,Meals & Entertainment (50%),True,False,2.3128571428571427,,1.0
+2024-12-27,Point of Sale - Interac PURCHASE436216196089 PETRO-CANADA 37 4506*********765,50.72,0.0,Fuel & Petroleum,False,False,2.415238095238095,,1.0
+2024-12-27,Point of Sale - Interac PURCHASE436111165247 CENTEX 16TH AVE 4506*********765,54.05,0.0,Fuel & Petroleum,False,False,2.573809523809524,,1.0
+2024-12-27,Point of Sale - Interac PURCHASE000098307608 KIM'S KATSU 4506*********223,111.2,0.0,Meals & Entertainment (50%),False,True,5.295238095238095,Unclassified,1.0
+2024-12-24,Point of Sale - Interac PURCHASE000001749026 REDWATER ESSO 4506*********765,42.8,0.0,Fuel & Petroleum,False,False,2.038095238095238,,1.0
+2024-12-24,Point of Sale - Interac PURCHASE435914411811 ACHTI'S STEAK & 4506*********765,156.69,0.0,Meals & Entertainment (50%),False,False,7.461428571428572,,1.0
+2024-12-23,Point of Sale - Interac PURCHASE435812242550 PETRO-CANADA 37 4506*********765,100.04,0.0,Fuel & Petroleum,False,False,4.763809523809524,,1.0
+2024-12-23,Point of Sale - Interac PURCHASE435617432517 PETRO-CANADA 77 4506*********223,40.0,0.0,Fuel & Petroleum,False,False,1.9047619047619047,,1.0
+2024-12-20,Point of Sale - Interac PURCHASE435517240661 PETRO-CANADA 37 4506*********765,142.56,0.0,Fuel & Petroleum,False,False,6.788571428571428,,1.0
+2024-12-20,Point of Sale - Interac PURCHASE435508999851 TIM HORTONS #76 4506*********765,157.65,0.0,Meals & Entertainment (50%),False,False,7.507142857142857,,1.0
+2024-12-20,Internet Banking INTERNET TRANSFER000000216038 TO: 00099/78-83439 4506*********765,3000.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2024-12-19,Point of Sale - Interac PURCHASE489001001090 FGP50206 FAS GA 4506*********765,20.06,0.0,Fuel & Petroleum,False,False,0.9552380952380951,,1.0
+2024-12-18,Point of Sale - Interac PURCHASE435315380732 PETRO-CANADA 37 4506*********765,152.42,0.0,Fuel & Petroleum,False,False,7.258095238095238,,1.0
+2024-12-18,Point of Sale - Interac PURCHASE487001001146 FGP50206 FAS GA 4506*********765,35.36,0.0,Fuel & Petroleum,False,False,1.6838095238095236,,1.0
+2024-12-17,Electronic Funds Transfer LOAN PAYMENT 000025198990969 SCOTIA BANK - SPL LOAN PAYMENT,535.73,0.0,Vehicle Lease/Loan Payment,True,False,25.510952380952382,,1.0
+2024-12-17,Point of Sale - Interac PURCHASE993863301217 LIQUOR STOP N S 4506*********765,104.97,0.0,Personal - Not Deductible,True,False,4.998571428571428,,1.0
+2024-12-17,Point of Sale - Interac PURCHASE435210156488 PETRO-CANADA 37 4506*********765,60.26,0.0,Fuel & Petroleum,False,False,2.8695238095238094,,1.0
+2024-12-16,Electronic Funds Transfer LOAN PAYMENT BR : 3333 TD ON-LINE LOANS SYSTEM,1458.29,0.0,Vehicle Lease/Loan Payment,False,False,69.44238095238096,,1.0
+2024-12-16,Electronic Funds Transfer BILL PAYMENT Koodo Mobile,87.1,0.0,Bank Charges & Interest,False,False,4.147619047619047,,1.0
+2024-12-16,Point of Sale - Interac PURCHASE435114291500 PETRO-CANADA 37 4506*********765,54.28,0.0,Fuel & Petroleum,False,False,2.5847619047619053,,1.0
+2024-12-16,Point of Sale - Interac PURCHASE137670838114 SQ *JOEY SHERWO 4506*********223,103.5,0.0,Meals & Entertainment (50%),False,False,4.928571428571429,,1.0
+2024-12-16,Point of Sale - Interac PURCHASE001001001129 PRINCESS AUTO 3 4506*********765,409.47,0.0,Equipment & Supplies,False,False,19.498571428571427,,1.0
+2024-12-16,Point of Sale - Interac PURCHASE001001001037 PRINCESS AUTO 3 4506*********765,73.46,0.0,Equipment & Supplies,False,False,3.498095238095238,,1.0
+2024-12-16,Point of Sale - Interac PURCHASE434914498304 PETRO CANADA372 4506*********765,53.36,0.0,Fuel & Petroleum,False,False,2.540952380952381,,1.0
+2024-12-16,Internet Banking E-TRANSFER105261288722 rent@realtyexecutivesfocu 4506*********765,207.59,0.0,Office Rent - Commercial,False,False,9.885238095238096,,1.0
+2024-12-16,Internet Banking E-TRANSFER105261286000 rent@realtyexecutivesfocu 4506*********765,1550.0,0.0,Office Rent - Commercial,False,False,73.80952380952381,,1.0
+2024-12-12,Electronic Funds Transfer GOVERNMENT CANADA,308.48,0.0,Income Tax Installment,False,False,14.689523809523811,,1.0
+2024-12-11,Internet Banking INTERNET TRANSFER000000208863 TO: 00099/78-83439 4506*********765,3000.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2024-12-09,Point of Sale - Interac PURCHASE434415205827 PETRO CANADA372 4506*********765,100.01,0.0,Fuel & Petroleum,False,False,4.762380952380953,,1.0
+2024-12-09,Point of Sale - Interac PURCHASE000001032066 BRUDERHEIM ESSO 4506*********765,50.0,0.0,Fuel & Petroleum,False,False,2.380952380952381,,1.0
+2024-12-09,Point of Sale - Interac PURCHASE000001069008 MOBIL@ - 1766 4506*********223,40.0,0.0,Fuel & Petroleum,False,False,1.9047619047619047,,1.0
+2024-12-06,Branch Transaction WITHDRAWAL 06079 REDWATER BANKING CENTRE,200.0,0.0,Shareholder Distribution,False,False,0.0,,0.0
+2024-12-06,Branch Transaction DEPOSIT 06079 REDWATER BANKING CENTRE,0.0,569.63,Revenue,False,False,0.0,,0.0
+2024-12-06,Point of Sale - Interac PURCHASE434112383583 PETRO CANADA372 4506*********765,132.52,0.0,Fuel & Petroleum,False,False,6.310476190476192,,1.0
+2024-12-06,Point of Sale - Interac PURCHASE434112433759 PETRO CANADA372 4506*********765,14.68,0.0,Fuel & Petroleum,False,False,0.699047619047619,,1.0
+2024-12-06,Branch Transaction WIRE TSF 0658456 LONG RUN EXPLORATION /ROC/009483108323932,0.0,13566.75,Revenue,False,False,0.0,,0.0
+2024-12-05,Electronic Funds Transfer INSURANCE MANULIFE FINANCIAL,31.89,0.0,Other / Unclassified,False,False,1.5185714285714285,,1.0
+2024-12-05,Point of Sale - Interac PURCHASE465231201205 OK TIRE REDWATE 4506*********765,151.2,0.0,Vehicle Repairs & Maintenance,False,False,7.199999999999999,,1.0
+2024-12-04,Point of Sale - Interac PURCHASE433915295862 PETRO CANADA372 4506*********765,122.54,0.0,Fuel & Petroleum,False,False,5.835238095238096,,1.0
+2024-12-04,Point of Sale - Interac PURCHASE433914250602 ACHTI'S STEAK & 4506*********223,77.18,0.0,Meals & Entertainment (50%),False,False,3.6752380952380954,,1.0
+2024-12-03,Point of Sale - Interac PURCHASE000097303871 UPTOWN PIZZA & 4506*********765,36.12,0.0,Meals & Entertainment (50%),False,False,1.72,,1.0
+2024-12-02,Electronic Funds Transfer BILL PAYMENT Koodo Mobile,70.6,0.0,Bank Charges & Interest,False,False,3.3619047619047615,,1.0
+2024-12-02,Point of Sale - Interac PURCHASE433619187558 CANADIAN TIRE # 4506*********765,16.04,0.0,Vehicle Repairs & Maintenance,False,True,0.7638095238095238,,1.0
+2024-12-02,Point of Sale - Interac PURCHASE433617498965 DOLLARAMA # 446 4506*********765,44.74,0.0,Office Supplies,True,True,2.1304761904761906,,1.0
+2024-12-02,Point of Sale - Interac PURCHASE433615445494 PETRO CANADA372 4506*********765,46.11,0.0,Fuel & Petroleum,False,False,2.1957142857142857,,1.0
+2024-12-02,Point of Sale - Interac PURCHASE000001001884 WALMART STORE # 4506*********765,110.02,0.0,Personal - Not Deductible,True,True,5.239047619047619,,1.0
+2024-12-02,Point of Sale - Interac PURCHASE000001001057 COSTCO BUSINESS 4506*********765,159.95,0.0,Equipment & Supplies,False,False,7.616666666666666,,1.0
+2024-12-02,Internet Banking E-TRANSFER011114414822 Paula Gour 4506*********765,0.0,1281.0,Bank Charges & Interest,False,False,0.0,,1.0
