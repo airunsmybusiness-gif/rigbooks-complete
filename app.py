@@ -209,6 +209,28 @@ def classify_dataframe(df):
         itc_pcts.append(pct)
     df['cra_category'] = cats
     df['itc_pct'] = itc_pcts
+    # Apply correct ITC rates per CRA rules
+    ZERO_ITC_CATEGORIES = [
+        'Vehicle Insurance', 'Vehicle Lease/Loan Payment',
+        'Business Insurance', 'Insurance',
+        'Bank Charges & Interest', 'Bank Charges',
+        'Loan Payment - Principal', 'Loan Payment - Interest', 'Loan Payment',
+        'Wages & Payroll',
+        'Shareholder Distribution', 'Shareholder Loan - Personal',
+        'GST Remittance', 'Corporate Tax Payment', 'Income Tax Installment',
+        'Personal - Not Deductible', 'Transfer - Non-Taxable',
+        'CCA - Capital Asset', 'Revenue', 'Rent',
+    ]
+    HALF_ITC_CATEGORIES = ['Meals & Entertainment (50%)', 'Meals (50% ITC)']
+
+    def get_itc_rate(cat):
+        if cat in ZERO_ITC_CATEGORIES:
+            return 0.0
+        if cat in HALF_ITC_CATEGORIES:
+            return 0.5
+        return 1.0
+
+    df['itc_pct'] = df['cra_category'].apply(get_itc_rate)
     df['itc_amount'] = df['debit'] * df['itc_pct'] * 0.05 / 1.05
     df.loc[df['cra_category'] == 'Revenue', 'itc_amount'] = 0.0
     return df
