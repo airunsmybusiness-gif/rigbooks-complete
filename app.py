@@ -409,7 +409,15 @@ elif page == "💰 Revenue":
         st.stop()
 
     df = st.session_state.classified_df.copy()
-    credits = df[df['credit'] > 0].copy()
+    all_credits = df[df['credit'] > 0].copy()
+
+    # Only count transactions classified as Revenue toward totals
+    if 'cra_category' in df.columns:
+        credits = all_credits[all_credits['cra_category'] == 'Revenue'].copy()
+        non_revenue_credits = all_credits[all_credits['cra_category'] != 'Revenue'].copy()
+    else:
+        credits = all_credits.copy()
+        non_revenue_credits = all_credits.iloc[0:0].copy()
 
     # Revenue breakdown
     wire_mask = credits['description'].str.contains('WIRE TSF', case=False, na=False)
@@ -445,6 +453,16 @@ elif page == "💰 Revenue":
         if not subset.empty:
             with st.expander(f"{label} ({len(subset)} transactions — ${subset['credit'].sum():,.2f})"):
                 st.dataframe(subset[['date','description','credit']].reset_index(drop=True), use_container_width=True)
+
+    # Non-revenue credits (excluded from totals)
+    if not non_revenue_credits.empty:
+        st.markdown("---")
+        st.markdown("### Non-Revenue Credits (excluded from totals above)")
+        st.caption("These credits are NOT counted as revenue. Reclassify below if needed.")
+        for cat in non_revenue_credits['cra_category'].unique():
+            cat_df = non_revenue_credits[non_revenue_credits['cra_category'] == cat]
+            with st.expander(f"{cat} ({len(cat_df)} transactions — ${cat_df['credit'].sum():,.2f})"):
+                st.dataframe(cat_df[['date','description','credit','cra_category']].reset_index(drop=True), use_container_width=True)
 
     # Reclassify transactions inline
     st.markdown("---")
