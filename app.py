@@ -835,7 +835,7 @@ elif page == "🚛 Mileage Log":
     st.markdown("---")
     st.markdown("### 📋 Full CRA-Compliant Mileage Log (292 Trips)")
     
-    mileage_html_path = Path("static/mileage_log_FY2024-2025.html")
+    mileage_html_path = Path(__file__).parent / "static" / "mileage_log_FY2024-2025.html"
     if mileage_html_path.exists():
         import streamlit.components.v1 as components
         with open(mileage_html_path, 'r') as f:
