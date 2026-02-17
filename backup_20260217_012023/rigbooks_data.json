@@ -1,0 +1,35 @@
+{
+  "transactions": [],
+  "phone_bills": [
+    {
+      "owner": "Lilibeth",
+      "period": "Dec 2024-Nov 2025",
+      "amount": 1081.42,
+      "biz_pct": 60,
+      "notes": "12mo, $90.12/mo avg"
+    },
+    {
+      "owner": "Greg",
+      "period": "Dec 2024-Nov 2025",
+      "amount": 944.85,
+      "biz_pct": 60,
+      "notes": "12mo, $78.88/mo avg"
+    }
+  ],
+  "cash_expenses": [],
+  "personal_expenses": [],
+  "other_expenses": [],
+  "vehicle_expenses": [],
+  "home_office": {
+    "rent": 0,
+    "property_tax": 0,
+    "insurance": 0,
+    "electricity": 0,
+    "gas": 0,
+    "water": 0,
+    "internet": 0,
+    "pct": 10
+  },
+  "revenue": [],
+  "mileage": []
+}

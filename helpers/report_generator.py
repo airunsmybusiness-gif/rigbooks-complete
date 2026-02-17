@@ -173,7 +173,7 @@ Fiscal Year End: {self.fiscal_year_end}
 Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}
 {'=' * 70}
 
-GREG CHICKEN (49% Shareholder)
+GREG MACDONALD (51% Shareholder)
 ------------------------------
 Opening Balance:                     ${tracker.greg_opening:>15,.2f}
 Less: Withdrawals/Distributions:     ${tracker.greg_withdrawals:>15,.2f}
@@ -193,7 +193,7 @@ Repayment deadline: November 30 of the following year
         
         report += f"""
 
-LILIBETH SEJERA (51% Shareholder)
+LILIBETH SEJERA (49% Shareholder)
 ---------------------------------
 Opening Balance:                     ${tracker.lilibeth_opening:>15,.2f}
 Less: Withdrawals/Distributions:     ${tracker.lilibeth_withdrawals:>15,.2f}
