@@ -772,18 +772,15 @@ elif page == "📄 T5 Slips":
 
 
 # ============================================================
-# PAGE: Mileage Log (NEW - FIX #8 from code review)
+# PAGE: Mileage Log (embeds the CRA-compliant HTML log)
 # ============================================================
 elif page == "🚛 Mileage Log":
     st.title(f"🚛 Mileage & Fuel Summary - FY {st.session_state.fiscal_year}")
     st.caption("Chevrolet Silverado — 100% Business Use")
     
     df = get_clean_df()
-    if df is None:
-        st.warning("Please upload and process a statement first.")
-        st.stop()
     
-    # Mileage log summary (from the HTML log data)
+    # Mileage log summary
     st.markdown("### 📊 Annual Summary")
     col1, col2, col3, col4 = st.columns(4)
     with col1: st.metric("Starting Odometer", "97,178 km")
@@ -794,24 +791,25 @@ elif page == "🚛 Mileage Log":
     st.markdown("---")
     
     # Fuel from bank transactions
-    fuel_categories = ['Fuel & Petroleum', 'Fuel']
-    fuel_df = df[df['cra_category'].isin(fuel_categories) & (df['debit'] > 0)]
-    total_fuel = fuel_df['debit'].sum()
-    fuel_itc = fuel_df['itc_amount'].sum()
-    
-    col1, col2, col3 = st.columns(3)
-    with col1: st.metric("Total Fuel (Company Card)", f"${total_fuel:,.2f}")
-    with col2: st.metric("Fuel Fills", f"{len(fuel_df)}")
-    with col3: st.metric("Fuel ITCs", f"${fuel_itc:,.2f}")
-    
-    st.markdown("---")
-    st.markdown("### 📅 Monthly Fuel Breakdown")
-    fuel_df = fuel_df.copy()
-    fuel_df['month'] = pd.to_datetime(fuel_df['date']).dt.strftime('%Y-%m')
-    monthly = fuel_df.groupby('month').agg({'debit': ['sum', 'count']}).reset_index()
-    monthly.columns = ['Month', 'Fuel Spend', 'Fills']
-    monthly['Avg/Fill'] = (monthly['Fuel Spend'] / monthly['Fills']).round(2)
-    st.dataframe(monthly, use_container_width=True)
+    if df is not None:
+        fuel_categories = ['Fuel & Petroleum', 'Fuel']
+        fuel_df = df[df['cra_category'].isin(fuel_categories) & (df['debit'] > 0)]
+        total_fuel = fuel_df['debit'].sum()
+        fuel_itc = fuel_df['itc_amount'].sum()
+        
+        col1, col2, col3 = st.columns(3)
+        with col1: st.metric("Total Fuel (Company Card)", f"${total_fuel:,.2f}")
+        with col2: st.metric("Fuel Fills", f"{len(fuel_df)}")
+        with col3: st.metric("Fuel ITCs", f"${fuel_itc:,.2f}")
+        
+        st.markdown("---")
+        st.markdown("### 📅 Monthly Fuel Breakdown")
+        fuel_df = fuel_df.copy()
+        fuel_df['month'] = pd.to_datetime(fuel_df['date']).dt.strftime('%Y-%m')
+        monthly = fuel_df.groupby('month').agg({'debit': ['sum', 'count']}).reset_index()
+        monthly.columns = ['Month', 'Fuel Spend', 'Fills']
+        monthly['Avg/Fill'] = (monthly['Fuel Spend'] / monthly['Fills']).round(2)
+        st.dataframe(monthly, use_container_width=True)
     
     st.markdown("---")
     st.markdown("### ⛽ Fuel Economy Note")
@@ -832,6 +830,27 @@ elif page == "🚛 Mileage Log":
     
     **Lilibeth's personal card fuel for business trips is intentionally excluded** from these figures 
     (conservative position — company claims less than actual business fuel used).""")
+    
+    # Embed the full CRA-compliant mileage log HTML
+    st.markdown("---")
+    st.markdown("### 📋 Full CRA-Compliant Mileage Log (292 Trips)")
+    
+    mileage_html_path = Path("static/mileage_log_FY2024-2025.html")
+    if mileage_html_path.exists():
+        import streamlit.components.v1 as components
+        with open(mileage_html_path, 'r') as f:
+            html_content = f.read()
+        components.html(html_content, height=800, scrolling=True)
+        
+        # Download button
+        st.download_button(
+            "📥 Download Mileage Log (HTML)",
+            html_content,
+            "RigBooks_CRA_Mileage_Log_FY2024-2025.html",
+            "text/html"
+        )
+    else:
+        st.warning("Mileage log HTML file not found. Upload it to `static/mileage_log_FY2024-2025.html`")
 
 
 # ============================================================

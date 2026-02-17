@@ -52,7 +52,7 @@ class TransactionClassifier:
         'Telephone & Communications': {'itc_eligible': True, 'itc_rate': 1.0},
         'Meals & Entertainment (50%)': {'itc_eligible': True, 'itc_rate': 0.5},
         'Travel': {'itc_eligible': True, 'itc_rate': 1.0},
-        'Rent - Commercial': {'itc_eligible': True, 'itc_rate': 1.0},
+        'Rent - Commercial': {'itc_eligible': True, 'itc_rate': 1.0},  # Redwater rent = business use (Peace River reported as rental income)
         'Utilities': {'itc_eligible': True, 'itc_rate': 1.0},
         'Wages & Salaries': {'itc_eligible': False, 'itc_rate': 0},
         'Shareholder Distribution': {'itc_eligible': False, 'itc_rate': 0},
@@ -79,12 +79,14 @@ class TransactionClassifier:
         # Mobile deposits - flag for review to confirm revenue vs personal deposit
         (r'MOBILE DEPOSIT', 'Revenue - Oilfield Services', False, True),
         
-        # Branch deposits - typically revenue
+        # Branch deposits — Redwater Banking Centre deposits are client cheques
+        (r'BRANCH.*DEPOSIT.*REDWATER|DEPOSIT.*REDWATER BANKING', 'Revenue - Oilfield Services', False, True),
         (r'BRANCH DEPOSIT|COUNTER DEPOSIT|DEPOSIT IN BRANCH', 'Revenue - Oilfield Services', False, True),
         
-        # Specific e-transfers that are revenue (known clients)
-        (r'E-TRANSFER.*Paula Gour', 'Revenue - Oilfield Services', False, False),
-        (r'E-TRANSFER.*Angela Henderson', 'Revenue - Oilfield Services', False, False),
+        # Specific e-transfers — flag for review (not auto-revenue)
+        # Paula Gour and Angela Henderson are NOT oilfield clients
+        (r'E-TRANSFER.*Paula Gour', 'Transfer - Non-Taxable', False, True),
+        (r'E-TRANSFER.*Angela Henderson', 'Professional Fees', False, False),
         
         # ===== SHAREHOLDER DISTRIBUTIONS =====
         (r'INTERNET TRANSFER.*TO:.*00099.*78-83439', 'Shareholder Distribution', False, False),
@@ -100,14 +102,14 @@ class TransactionClassifier:
         (r'rent@realtyfocus|rent@realtyexecutives|REALTYFOCUS', 'Rent - Commercial', False, False),
         
         # ===== BANK FEES (No ITC) =====
-        (r'ACCOUNT FEE|SERVICE CHARGE|MONTHLY.*FEE|OVERDRAFT.*FEE|NSF|OVER LIMIT', 'Bank Charges & Interest', False, False),
+        (r'ACCOUNT FEE|SERVICE CHARGE|MONTHLY.*FEE|OVERDRAFT.*FEE|NSF|OVER LIMIT|OVERDRAFT S/C', 'Bank Charges & Interest', False, False),
         (r'OVERDRAFT INTEREST|INTEREST CHARGE', 'Bank Charges & Interest', False, False),
         
         # ===== GOVERNMENT =====
         (r'DEBIT MEMO.*GOVERNMENT|GPFS.*GOVERNMENT', 'GST Remittance', False, False),
         
         # ===== INSURANCE (No ITC - exempt supply) =====
-        (r'MANULIFE', 'Insurance - Business', False, False),
+        (r'MANULIFE|INTACT INSURA', 'Insurance - Business', False, False),
         
         # ===== TELEPHONE =====
         (r'KOODO|TELUS|BELL|ROGERS|FIDO', 'Telephone & Communications', False, False),
@@ -117,11 +119,14 @@ class TransactionClassifier:
         (r'FAS GA|FGP\d+', 'Fuel & Petroleum', False, False),
         (r'CO-OP.*BRIN|NC CO-OP|CIRCLE K', 'Fuel & Petroleum', False, False),
         (r'REDWATER ESSO|BRUDERHEIM ESSO', 'Fuel & Petroleum', False, False),
+        (r'CANCO PETROLEUM|BOYLE PAY.*PUM|TOFIELD TEMPO|SPRUCE GROVE GA', 'Fuel & Petroleum', False, False),
+        (r'CPC\s*/\s*SCP\s+\d', 'Fuel & Petroleum', False, False),
         
         # ===== VEHICLE REPAIRS (100% ITC) =====
         (r'OK TIRE|NAPA|PART SOURCE|JIFFY LUBE', 'Vehicle Repairs & Maintenance', False, False),
         (r'CANADIAN TIRE', 'Vehicle Repairs & Maintenance', False, True),
         (r'REDWATER REGIST|REGISTRY', 'Vehicle Repairs & Maintenance', False, False),
+        (r'KEEPS MECHANICA|GOODBRAND AUTO', 'Vehicle Repairs & Maintenance', False, False),
         
         # ===== EQUIPMENT (100% ITC) =====
         (r'PRINCESS AUTO', 'Equipment & Supplies', False, False),
@@ -138,6 +143,14 @@ class TransactionClassifier:
         (r'A&W |MCDONALD|WENDY|SUBWAY', 'Meals & Entertainment (50%)', False, False),
         (r'ACHTI.*STEAK|RAINBOW RESTAUR|UPTOWN PIZZA', 'Meals & Entertainment (50%)', False, False),
         (r'JOEY|DQ GRILL', 'Meals & Entertainment (50%)', False, False),
+        (r'DAIRY QUEEN', 'Meals & Entertainment (50%)', False, False),
+        (r'J&R DRIVE THRU|FATBURGER', 'Meals & Entertainment (50%)', False, False),
+        
+        # ===== UTILITIES =====
+        (r'ATCO ENERGY|ATCO ELECTRIC|EPCOR|DIRECT ENERGY', 'Utilities', False, False),
+        
+        # ===== EQUIPMENT & WORKWEAR (100% ITC) =====
+        (r'JOBSITE WORK|MARKS WORK|WORK WAREHOUSE', 'Equipment & Supplies', False, False),
         
         # ===== PERSONAL - Shareholder Loan (No ITC) =====
         (r'LIQUOR|WINE RACK|BEER STORE', 'Shareholder Loan - Personal Expense', True, False),
@@ -155,6 +168,26 @@ class TransactionClassifier:
         (r'BUFFET ROYALE|YANG MING|KHAN RESTAURANT', 'Shareholder Loan - Personal Expense', True, False),
         (r'AMAZON|TEMU|IHERB|ETSY', 'Shareholder Loan - Personal Expense', True, True),
         (r'SNOW VALLEY|KICKS SALOO|VENUE', 'Shareholder Loan - Personal Expense', True, False),
+        (r'PARK MAZDA|MAZDA', 'Vehicle Repairs & Maintenance', False, False),
+        (r'REAL CDN|SUPERSTORE', 'Shareholder Loan - Personal Expense', True, False),
+        (r'SOUTHFORT VETER|VETERINAR', 'Shareholder Loan - Personal Expense', True, False),
+        (r'JYSK|ASHLEY|FURNITURE', 'Shareholder Loan - Personal Expense', True, False),
+        (r'BIANCA AMOR', 'Shareholder Loan - Personal Expense', True, False),
+        (r'KIM.S KATSU|LILY.S STEAK', 'Shareholder Loan - Personal Expense', True, False),
+        (r'ATLANTIC KI|UNIVERSITY TRAD', 'Shareholder Loan - Personal Expense', True, False),
+        (r'RIVER CREE', 'Shareholder Loan - Personal Expense', True, False),
+        (r'INVERMERE CANNA', 'Shareholder Loan - Personal Expense', True, False),
+        (r'LAMONT FOODS|BREAD H', 'Shareholder Loan - Personal Expense', True, False),
+        (r'EDMONTON STORE', 'Shareholder Loan - Personal Expense', True, True),
+        (r'FORT IN VIEW GO', 'Shareholder Loan - Personal Expense', True, False),
+        (r'SOUTH FORT CHEV', 'Shareholder Loan - Personal Expense', True, False),
+        (r'KENTWOOD FORD', 'Shareholder Loan - Personal Expense', True, False),
+        (r'LUCKY-7 CONVENI|LUCKY.*CONVENIENCE', 'Shareholder Loan - Personal Expense', True, False),
+        (r'REDWATER COMMUN', 'Shareholder Loan - Personal Expense', True, False),
+        (r'7-ELEVEN|7 ELEVEN', 'Shareholder Loan - Personal Expense', True, True),
+        (r'SQ \*THE BREAD|BREAD HOUSE', 'Shareholder Loan - Personal Expense', True, False),
+        (r'SQ \*REDWATER', 'Shareholder Loan - Personal Expense', True, True),
+        (r'GCOC\s*#', 'Shareholder Loan - Personal Expense', True, True),
         
         # ===== TRANSFERS (Non-taxable - No ITC) =====
         # These are LAST so specific e-transfers above take precedence
@@ -277,6 +310,30 @@ class TransactionClassifier:
             df.at[idx, 'needs_review'] = result['needs_review']
             df.at[idx, 'itc_amount'] = result['itc_amount']
             df.at[idx, 'notes'] = result['notes']
+        
+        # ===== POST-CLASSIFICATION OVERRIDES =====
+        # Specific transactions that can't be matched by description alone
+        # $147 mobile deposit on 2025-06-09 = CPO revenue for Greg (confirmed by owner)
+        mask_147 = (
+            (df['date'] == '2025-06-09') & 
+            (df['credit'] == 147.00) & 
+            (df['description'].str.contains('MOBILE DEPOSIT', case=False, na=False))
+        )
+        df.loc[mask_147, 'cra_category'] = 'Revenue - Oilfield Services'
+        df.loc[mask_147, 'is_personal'] = False
+        df.loc[mask_147, 'needs_review'] = False
+        df.loc[mask_147, 'itc_amount'] = 0.0
+        df.loc[mask_147, 'notes'] = 'CPO revenue - confirmed by owner'
+        
+        # $131.20 on 2025-07-03 = 1185508 Alberta Ltd — business equipment (confirmed by owner)
+        mask_131 = (
+            (df['date'] == '2025-07-03') & 
+            (abs(df['debit'] - 131.20) < 0.01) & 
+            (df['description'].str.contains('1185508 ALBERTA', case=False, na=False))
+        )
+        df.loc[mask_131, 'cra_category'] = 'Equipment & Supplies'
+        df.loc[mask_131, 'needs_review'] = False
+        df.loc[mask_131, 'notes'] = 'Business equipment - confirmed by owner'
         
         return df
 
